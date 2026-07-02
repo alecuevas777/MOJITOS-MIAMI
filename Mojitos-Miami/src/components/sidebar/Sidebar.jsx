@@ -90,14 +90,7 @@ export default function Sidebar() {
           </a>
         </div>
 
-        <div className={styles.promo} id="promos">
-          <div className={styles.promoBadge}>HAPPY HOUR</div>
-          <p className={styles.promoTitle}>2X1 EN MOJITOS</p>
-          <p className={styles.promoHours}>{siteConfig.happyHour}</p>
-          <div className={styles.promoImage} aria-hidden="true">
-            🍹🍹
-          </div>
-        </div>
+      
       </aside>
     </>
   )
