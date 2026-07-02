@@ -1,0 +1,80 @@
+.fabGroup {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cartFab,
+.whatsappFab {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  font-size: 1.375rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  transition: transform var(--transition);
+}
+
+.cartFab:hover,
+.whatsappFab:hover {
+  transform: scale(1.06);
+}
+
+.cartFab {
+  background-color: #000000;
+  color: #ffffff;
+  border: 2px solid var(--color-primary);
+  box-shadow: 0 4px 20px rgba(184, 240, 74, 0.25);
+}
+
+.whatsappFab {
+  background-color: #25d366;
+  color: #ffffff;
+  box-shadow:
+    0 0 24px rgba(37, 211, 102, 0.45),
+    0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.whatsappFab:hover {
+  box-shadow:
+    0 0 32px rgba(37, 211, 102, 0.55),
+    0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.badge {
+  position: absolute;
+  top: -0.25rem;
+  right: -0.25rem;
+  display: grid;
+  place-items: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding-inline: 0.3rem;
+  border: 2px solid #000000;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  color: var(--color-bg);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+@media (max-width: 480px) {
+  .fabGroup {
+    right: 1rem;
+    bottom: 1rem;
+  }
+
+  .cartFab,
+  .whatsappFab {
+    width: 3.25rem;
+    height: 3.25rem;
+    font-size: 1.25rem;
+  }
+}

@@ -1,0 +1,36 @@
+:root {
+  --color-bg: #000000;
+  --color-surface: #0d0d0d;
+  --color-surface-2: #141414;
+  --color-surface-3: #1a1a1a;
+  --color-border: #2a2a2a;
+  --color-border-light: #333333;
+
+  --color-primary: #b8f04a;
+  --color-primary-dark: #9ed42e;
+  --color-primary-muted: rgba(184, 240, 74, 0.12);
+
+  --color-text: #ffffff;
+  --color-text-muted: #9ca3af;
+  --color-text-dim: #6b7280;
+
+  --color-error: #ef4444;
+  --color-whatsapp: #25d366;
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-script: 'Dancing Script', cursive;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px rgba(184, 240, 74, 0.15);
+
+  --sidebar-width: 240px;
+  --cart-width: 300px;
+  --transition: 200ms ease;
+}
