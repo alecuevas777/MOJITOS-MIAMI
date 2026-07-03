@@ -14,7 +14,15 @@
 
 .brand {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.logoImage {
+  width: 150px;   /* Ajusta el tamaño según prefieras */
+  height: auto;
+  display: block;
+  object-fit: contain;
 }
 
 .logoBrand {

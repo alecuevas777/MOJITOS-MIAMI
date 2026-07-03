@@ -8,13 +8,21 @@ export default function MobileHeader() {
 
   return (
     <header className={styles.header}>
-      <button type="button" className={styles.menuBtn} onClick={toggleSidebar} aria-label="Menú">
+      <button
+        type="button"
+        className={styles.menuBtn}
+        onClick={toggleSidebar}
+        aria-label="Menú"
+      >
         <FiMenu />
       </button>
 
       <div className={styles.logo}>
-        <span>{siteConfig.brand}</span>
-        <small>{siteConfig.brandSuffix}</small>
+        <img
+          src={siteConfig.logo}
+          alt={siteConfig.name}
+          className={styles.logoImage}
+        />
       </div>
 
       <div className={styles.spacer} aria-hidden="true" />

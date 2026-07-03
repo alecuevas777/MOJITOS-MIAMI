@@ -9,11 +9,13 @@ export default function Footer() {
   return (
     <footer className={styles.footer} id="contacto">
       <div className={styles.grid}>
-        <div className={styles.brand}>
-          <span className={styles.logoBrand}>{siteConfig.brand}</span>
-          <span className={styles.logoSuffix}>{siteConfig.brandSuffix}</span>
-        </div>
-
+  <div className={styles.brand}>
+  <img
+    src={siteConfig.logo}
+    alt={siteConfig.name}
+    className={styles.logoImage}
+  />
+</div>
         <div>
           <h3 className={styles.colTitle}>SÍGUENOS</h3>
           <div className={styles.social}>

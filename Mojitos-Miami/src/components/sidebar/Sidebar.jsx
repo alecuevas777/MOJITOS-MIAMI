@@ -31,15 +31,13 @@ export default function Sidebar() {
       />
 
       <aside className={cn(styles.sidebar, isSidebarOpen && styles.sidebarOpen)}>
-        <div className={styles.logo}>
-          <span className={styles.logoIcon} aria-hidden="true">
-            🌿
-          </span>
-          <div>
-            <span className={styles.logoBrand}>{siteConfig.brand}</span>
-            <span className={styles.logoSuffix}>{siteConfig.brandSuffix}</span>
-          </div>
-        </div>
+       <div className={styles.logo}>
+  <img
+    src={siteConfig.logo}
+    alt={siteConfig.name}
+    className={styles.logoImage}
+  />
+</div>
 
         <nav className={styles.nav} aria-label="Navegación principal">
           <ul>

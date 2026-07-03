@@ -16,13 +16,18 @@
 .overlay {
   display: none;
 }
-
 .logo {
+  margin-bottom: 1.5rem;
   display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 0.625rem;
-  margin-bottom: 1.75rem;
-  padding-inline: 0.5rem;
+  padding: 20px 0;
+}
+
+.logoImage {
+  width: 120px;
+  height: auto;
+  display: block;
 }
 
 .logoIcon {
