@@ -124,7 +124,8 @@ DROP TABLE IF EXISTS `producto`;
 CREATE TABLE `producto` (
   `id_producto` int NOT NULL AUTO_INCREMENT,
   `nom_producto` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `precio_producto` decimal(10,2) NOT NULL,
+  `precio_producto` decimal(10,2) DEFAULT NULL,
+  `usa_variantes` tinyint(1) NOT NULL DEFAULT 0,
   `descuento_porcentaje` decimal(5,2) DEFAULT NULL,
   `stock_disponible` int unsigned DEFAULT NULL,
   `aviso_stock_desde` int unsigned DEFAULT NULL,
@@ -138,6 +139,22 @@ CREATE TABLE `producto` (
   UNIQUE KEY `producto_categoria_nombre_unique` (`categoria_id`,`nom_producto`),
   KEY `producto_categoria_id_idx` (`categoria_id`),
   CONSTRAINT `producto_categoria_id_fkey` FOREIGN KEY (`categoria_id`) REFERENCES `categoria` (`id_categoria`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -----------------------------------------------------------------------------
+-- Tabla: cupon_producto
+-- -----------------------------------------------------------------------------
+DROP TABLE IF EXISTS `cupon_producto`;
+
+CREATE TABLE `producto_variantes` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `producto_id` int NOT NULL,
+  `nombre_variante` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `precio` decimal(10,2) NOT NULL,
+  `stock` int unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `pv_producto_idx` (`producto_id`),
+  CONSTRAINT `pv_producto_fkey` FOREIGN KEY (`producto_id`) REFERENCES `producto` (`id_producto`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- -----------------------------------------------------------------------------

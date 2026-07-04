@@ -23,6 +23,14 @@ export async function getMenu() {
   return data
 }
 
+export async function getProductById(id) {
+  const { data } = await api.get('/productos.php', {
+    params: { id },
+    timeout: 2500,
+  })
+  return data
+}
+
 export async function sendContactForm(payload) {
   const { data } = await api.post('/contact', payload)
   return data

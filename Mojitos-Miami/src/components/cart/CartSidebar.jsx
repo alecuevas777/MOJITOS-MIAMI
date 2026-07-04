@@ -30,6 +30,9 @@ export default function CartSidebar() {
     openOrderModal(
       items.map((item) => ({
         id: item.id,
+        productId: item.productId,
+        variantId: item.variantId,
+        variantName: item.variantName,
         name: item.name,
         price: item.price,
         quantity: item.quantity,
@@ -75,6 +78,9 @@ export default function CartSidebar() {
 
                   <div className={styles.itemInfo}>
                     <p className={styles.itemName}>{item.name}</p>
+                    {item.variantName && (
+                      <p className={styles.itemVariant}>{item.variantName}</p>
+                    )}
                     <p className={styles.itemPrice}>{formatPrice(item.price)}</p>
 
                     <div className={styles.quantity}>

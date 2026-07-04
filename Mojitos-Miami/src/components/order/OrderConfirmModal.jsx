@@ -4,6 +4,7 @@ import { FaWhatsapp } from 'react-icons/fa'
 import toast from 'react-hot-toast'
 import { PHONE_PREFIX, alcoholIntensities, extraIngredients, MAX_EXTRAS, paymentMethods, deliveryModes } from '@/data/orderConfig'
 import { siteConfig } from '@/data/siteConfig'
+import { getProductById } from '@/services/api'
 import {
   calculateOrderTotals,
   createOrderDraft,
@@ -35,6 +36,57 @@ export default function OrderConfirmModal() {
   }, [orderModal])
 
   useEffect(() => {
+    if (!draft) return undefined
+
+    const pendingLines = draft.lines.filter(
+      (line) => line.usa_variantes && (!line.variants || line.variants.length === 0),
+    )
+
+    if (pendingLines.length === 0) return undefined
+
+    let active = true
+
+    async function loadVariantsForDraft() {
+      try {
+        const linesWithVariants = await Promise.all(
+          pendingLines.map(async (line) => {
+            const data = await getProductById(line.productId)
+            return {
+              ...line,
+              variants: data.variantes ?? [],
+              variantId: line.variantId ?? data.variantes?.[0]?.id ?? null,
+              variantName:
+                line.variantName ?? data.variantes?.[0]?.nombre_variante ?? null,
+              price:
+                line.variantId || line.variantName
+                  ? line.price
+                  : Number(data.variantes?.[0]?.precio ?? line.price),
+            }
+          }),
+        )
+
+        if (!active) return
+
+        setDraft((current) => ({
+          ...current,
+          lines: current.lines.map((line) => {
+            const updated = linesWithVariants.find((item) => item.id === line.id)
+            return updated ?? line
+          }),
+        }))
+      } catch (_) {
+        // No-op: keep current draft if variant loading fails.
+      }
+    }
+
+    loadVariantsForDraft()
+
+    return () => {
+      active = false
+    }
+  }, [draft])
+
+  useEffect(() => {
     if (!orderModal) return undefined
 
     const handleKeyDown = (event) => {
@@ -57,6 +109,22 @@ export default function OrderConfirmModal() {
 
   const updateDraft = (patch) => {
     setDraft((current) => ({ ...current, ...patch }))
+  }
+
+  const handleVariantChange = (lineId, variant) => {
+    setDraft((current) => ({
+      ...current,
+      lines: current.lines.map((line) =>
+        line.id === lineId
+          ? {
+              ...line,
+              variantId: variant.id,
+              variantName: variant.nombre_variante,
+              price: Number(variant.precio),
+            }
+          : line,
+      ),
+    }))
   }
 
   const handleIntensityChange = (lineId, intensity) => {
@@ -148,6 +216,39 @@ export default function OrderConfirmModal() {
         </header>
 
         <div className={styles.body}>
+          {draft.lines.map((line) => (
+            <section key={`variant-${line.id}`} className={styles.section}>
+              <h3 className={styles.sectionTitle}>Elige tu sabor</h3>
+              <p className={styles.sectionHint}>
+                Selecciona el tipo de mojito para este producto
+              </p>
+              <p className={styles.lineLabel}>
+                {line.quantity} x {line.name}
+              </p>
+
+              {line.variants?.length > 0 ? (
+                <div className={styles.optionGroup}>
+                  {line.variants.map((variant) => (
+                    <button
+                      key={variant.id}
+                      type="button"
+                      className={cn(
+                        styles.optionBtn,
+                        line.variantId === variant.id && styles.optionBtnActive,
+                      )}
+                      onClick={() => handleVariantChange(line.id, variant)}
+                    >
+                      <span>{variant.nombre_variante}</span>
+                      <strong>{formatPrice(variant.precio)}</strong>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <p className={styles.variantHint}>Cargando opciones...</p>
+              )}
+            </section>
+          ))}
+
           {draft.lines
             .filter((line) => productNeedsIntensity(line.category))
             .map((line) => (

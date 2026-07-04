@@ -18,6 +18,10 @@ export function createOrderDraft(lines) {
   return {
     lines: lines.map((line) => ({
       id: line.id,
+      productId: line.productId ?? null,
+      variantId: line.variantId ?? null,
+      variantName: line.variantName ?? null,
+      variants: line.variants ?? [],
       name: line.name,
       price: line.price,
       quantity: line.quantity,
@@ -55,9 +59,13 @@ export function validateCouponCode(code) {
 export function isOrderDraftValid(draft) {
   if (!draft?.lines?.length) return false
 
-  const intensityValid = draft.lines.every((line) => {
-    if (!productNeedsIntensity(line.category)) return true
-    return alcoholIntensities.some((option) => option.id === line.intensity)
+  const itemsValid = draft.lines.every((line) => {
+    const intensityValid = !productNeedsIntensity(line.category) ||
+      alcoholIntensities.some((option) => option.id === line.intensity)
+
+    const variantValid = !line.variants?.length || line.variantId !== null
+
+    return intensityValid && variantValid
   })
 
   const customerValid =
@@ -72,7 +80,7 @@ export function isOrderDraftValid(draft) {
   const deliveryValid =
     draft.deliveryMode !== 'delivery' || draft.deliveryAddress.trim().length >= 5
 
-  return intensityValid && customerValid && couponValid && deliveryValid
+  return itemsValid && customerValid && couponValid && deliveryValid
 }
 
 export function calculateOrderTotals(draft) {
@@ -118,7 +126,8 @@ export function buildConfirmOrderMessage(draft) {
   const lines = ['Hola, me gustaría pedir:', '']
 
   draft.lines.forEach((line) => {
-    let itemLine = `${line.quantity} x ${line.name} (${formatPrice(line.price)} c/u)`
+    const variantLabel = line.variantName ? ` - ${line.variantName}` : ''
+    let itemLine = `${line.quantity} x ${line.name}${variantLabel} (${formatPrice(line.price)} c/u)`
 
     if (line.intensity) {
       const intensityLabel = alcoholIntensities.find(

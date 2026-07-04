@@ -123,6 +123,12 @@
   color: var(--color-text);
 }
 
+.itemVariant {
+  margin-top: 0.125rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
 .itemPrice {
   margin-top: 0.125rem;
   font-size: 0.8125rem;

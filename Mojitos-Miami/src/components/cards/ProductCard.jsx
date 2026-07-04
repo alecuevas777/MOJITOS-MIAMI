@@ -12,6 +12,7 @@ function ProductCard({ product, priority = false }) {
   const addItem = useCartStore((state) => state.addItem)
   const openOrderModal = useUiStore((state) => state.openOrderModal)
   const openProductDetail = useUiStore((state) => state.openProductDetail)
+
   const [quantity, setQuantity] = useState(1)
   const [imageLoaded, setImageLoaded] = useState(false)
 
@@ -30,6 +31,10 @@ function ProductCard({ product, priority = false }) {
           quantity,
           category: product.category,
           image: product.image,
+          productId: product.id,
+          variantId: null,
+          variantName: null,
+          variants: [],
         },
       ],
       'product',
@@ -41,15 +46,19 @@ function ProductCard({ product, priority = false }) {
   }
 
   return (
-    <article className={styles.card}>
+    <article id={`product-${product.id}`} className={styles.card}>
       <button
         type="button"
         className={cn(styles.imageWrap, !imageLoaded && styles.imageLoading)}
         onClick={handleOpenDetail}
         aria-label={`Ver detalle de ${product.name}`}
       >
-        {!imageLoaded && <span className={styles.imageSkeleton} aria-hidden="true" />}
+        {!imageLoaded && (
+          <span className={styles.imageSkeleton} aria-hidden="true" />
+        )}
+
         <ProductTags product={product} layout="overlay" />
+
         <img
           src={product.image}
           alt={product.name}
@@ -68,8 +77,15 @@ function ProductCard({ product, priority = false }) {
         <p className={styles.description}>{product.description}</p>
 
         <div className={styles.priceRow}>
-          <span className={styles.price}>{formatPrice(product.price)}</span>
-          <button type="button" className={styles.viewMoreBtn} onClick={handleOpenDetail}>
+          <span className={styles.price}>
+            {formatPrice(product.price)}
+          </span>
+
+          <button
+            type="button"
+            className={styles.viewMoreBtn}
+            onClick={handleOpenDetail}
+          >
             Ver más
           </button>
         </div>
@@ -77,20 +93,21 @@ function ProductCard({ product, priority = false }) {
         <div className={styles.actionsRow}>
           <div className={styles.quantity}>
             <span className={styles.quantityLabel}>Cant.</span>
+
             <button
               type="button"
-              onClick={() => setQuantity((value) => Math.max(1, value - 1))}
-              aria-label="Disminuir cantidad"
+              onClick={() => setQuantity((v) => Math.max(1, v - 1))}
             >
-              <FiMinus aria-hidden="true" />
+              <FiMinus />
             </button>
+
             <span>{quantity}</span>
+
             <button
               type="button"
-              onClick={() => setQuantity((value) => value + 1)}
-              aria-label="Aumentar cantidad"
+              onClick={() => setQuantity((v) => v + 1)}
             >
-              <FiPlus aria-hidden="true" />
+              <FiPlus />
             </button>
           </div>
 
@@ -98,15 +115,18 @@ function ProductCard({ product, priority = false }) {
             type="button"
             className={styles.addBtn}
             onClick={handleAdd}
-            aria-label={`Añadir ${quantity} ${product.name} al carrito`}
           >
-            <FiShoppingCart aria-hidden="true" />
+            <FiShoppingCart />
             Añadir
           </button>
         </div>
 
-        <button type="button" className={styles.orderBtn} onClick={handleOrder}>
-          <FaWhatsapp aria-hidden="true" />
+        <button
+          type="button"
+          className={styles.orderBtn}
+          onClick={handleOrder}
+        >
+          <FaWhatsapp />
           Pedir ahora
         </button>
       </div>

@@ -12,14 +12,15 @@ export const useCartStore = create(
     (set, get) => ({
       items: [],
 
-      addItem: (product, quantity = 1) => {
+      addItem: (product, quantity = 1, variant = null) => {
+        const itemId = variant ? `${product.id}-${variant.id}` : `${product.id}`
         const { items } = get()
-        const existing = items.find((item) => item.id === product.id)
+        const existing = items.find((item) => item.id === itemId)
 
         if (existing) {
           set({
             items: items.map((item) =>
-              item.id === product.id
+              item.id === itemId
                 ? {
                     ...item,
                     quantity: item.quantity + quantity,
@@ -35,9 +36,14 @@ export const useCartStore = create(
           items: [
             ...items,
             {
-              id: product.id,
+              id: itemId,
+              productId: product.id,
+              variantId: variant?.id ?? null,
+              variantName: variant?.nombre_variante ?? null,
+              usa_variantes: Boolean(product.usa_variantes),
+              variants: variant ? [variant] : [],
               name: product.name,
-              price: product.price,
+              price: Number(variant?.precio ?? product.price),
               image: product.image,
               category: product.category,
               quantity,
