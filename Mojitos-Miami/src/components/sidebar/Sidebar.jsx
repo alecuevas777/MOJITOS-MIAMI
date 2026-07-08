@@ -1,4 +1,4 @@
-import { FiBookOpen, FiHome } from 'react-icons/fi'
+import { FiBookOpen, FiHome, FiX } from 'react-icons/fi'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import { navLinks } from '@/data/menuData'
 import { useConfigStore } from '@/store/configStore'
@@ -32,13 +32,23 @@ export default function Sidebar() {
       />
 
       <aside className={cn(styles.sidebar, isSidebarOpen && styles.sidebarOpen)}>
-       <div className={styles.logo}>
-  <img
-    src={site.logo}
-    alt={site.name}
-    className={styles.logoImage}
-  />
-</div>
+        <div className={styles.sidebarTop}>
+          <div className={styles.logo}>
+            <img
+              src={site.logo}
+              alt={site.name}
+              className={styles.logoImage}
+            />
+          </div>
+          <button
+            type="button"
+            className={styles.closeBtn}
+            onClick={closeSidebar}
+            aria-label="Cerrar menú"
+          >
+            <FiX aria-hidden="true" />
+          </button>
+        </div>
 
         <nav className={styles.nav} aria-label="Navegación principal">
           <ul>

@@ -3,6 +3,8 @@ import { FiPlus } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 import AdminPageHeader from '@/components/admin/AdminPageHeader'
 import AdminTable from '@/components/admin/AdminTable'
+import AdminListToolbar from '@/components/admin/AdminListToolbar'
+import AdminPagination from '@/components/admin/AdminPagination'
 import AdminRowActions from '@/components/admin/AdminRowActions'
 import AdminModal, { AdminField, AdminFormActions, adminInputClass, adminInputStyle } from '@/components/admin/AdminModal'
 import AdminConfirmDialog from '@/components/admin/AdminConfirmDialog'
@@ -16,6 +18,7 @@ import {
   updateProducto,
 } from '@/services/adminApi'
 import { formatPrice, normalizeTextField } from '@/utils'
+import { useAdminListControls } from '@/hooks/useAdminListControls'
 
 const emptyForm = {
   nom_producto: '',
@@ -59,6 +62,15 @@ export default function ProductosDashboard() {
   const [isSaving, setIsSaving] = useState(false)
   const [toDelete, setToDelete] = useState(null)
   const [variantes, setVariantes] = useState([])
+
+  const list = useAdminListControls(productos, {
+    searchKeys: [
+      'nom_producto',
+      'nom_categoria',
+      'descripcion_producto',
+      (row) => String(row.id_producto ?? ''),
+    ],
+  })
 
   const loadData = useCallback(async () => {
     setIsLoading(true)
@@ -198,16 +210,23 @@ export default function ProductosDashboard() {
         title="Productos"
         description="Listado y gestión de productos del menú."
         action={
-          <button
-            type="button"
-            onClick={openCreate}
-            disabled={!categorias.length}
-            className="flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold transition-opacity hover:opacity-90 disabled:opacity-50 sm:w-auto"
-            style={{ backgroundColor: 'var(--admin-accent)', color: 'var(--admin-bg)' }}
-          >
-            <FiPlus size={16} />
-            Nuevo producto
-          </button>
+          <AdminListToolbar
+            searchValue={list.search}
+            onSearchChange={list.setSearch}
+            searchPlaceholder="Buscar producto..."
+            action={
+              <button
+                type="button"
+                onClick={openCreate}
+                disabled={!categorias.length}
+                className="flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold transition-opacity hover:opacity-90 disabled:opacity-50 sm:w-auto"
+                style={{ backgroundColor: 'var(--admin-accent)', color: 'var(--admin-bg)' }}
+              >
+                <FiPlus size={16} />
+                Nuevo producto
+              </button>
+            }
+          />
         }
       />
 
@@ -225,11 +244,24 @@ export default function ProductosDashboard() {
         ) : error ? (
           <p className="py-12 text-center text-sm text-red-400">{error}</p>
         ) : (
-          <AdminTable
-            columns={columns}
-            rows={productos.map((p) => ({ ...p, id: p.id_producto }))}
-            emptyMessage="No hay productos registrados."
-          />
+          <>
+            <AdminTable
+              columns={columns}
+              rows={list.paginated.map((p) => ({ ...p, id: p.id_producto }))}
+              emptyMessage={
+                list.hasSearch
+                  ? 'No se encontraron productos con esa búsqueda.'
+                  : 'No hay productos registrados.'
+              }
+            />
+            <AdminPagination
+              page={list.page}
+              totalPages={list.totalPages}
+              totalItems={list.totalItems}
+              pageSize={list.pageSize}
+              onPageChange={list.setPage}
+            />
+          </>
         )}
       </div>
 

@@ -3,6 +3,8 @@ import { FiPlus } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 import AdminPageHeader from '@/components/admin/AdminPageHeader'
 import AdminTable from '@/components/admin/AdminTable'
+import AdminListToolbar from '@/components/admin/AdminListToolbar'
+import AdminPagination from '@/components/admin/AdminPagination'
 import AdminRowActions from '@/components/admin/AdminRowActions'
 import AdminModal, {
   AdminField,
@@ -20,6 +22,7 @@ import {
   updateCupon,
 } from '@/services/adminApi'
 import { formatPrice } from '@/utils'
+import { useAdminListControls } from '@/hooks/useAdminListControls'
 
 const TIPO_OPTIONS = [
   { value: 'porcentaje_pedido', label: '% sobre el pedido completo' },
@@ -91,6 +94,15 @@ export default function CuponesDashboard() {
   const [form, setForm] = useState(emptyForm)
   const [isSaving, setIsSaving] = useState(false)
   const [toDelete, setToDelete] = useState(null)
+
+  const list = useAdminListControls(cupones, {
+    searchKeys: [
+      'codigo',
+      'descripcion',
+      (row) => TIPO_LABELS[row.tipo] ?? row.tipo,
+      (row) => String(row.id_cupon ?? ''),
+    ],
+  })
 
   const loadData = useCallback(async () => {
     setIsLoading(true)
@@ -239,15 +251,22 @@ export default function CuponesDashboard() {
         title="Cupones"
         description="Promociones y códigos de descuento."
         action={
-          <button
-            type="button"
-            onClick={openCreate}
-            className="flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold transition-opacity hover:opacity-90 sm:w-auto"
-            style={{ backgroundColor: 'var(--admin-accent)', color: 'var(--admin-bg)' }}
-          >
-            <FiPlus size={16} />
-            Nuevo cupón
-          </button>
+          <AdminListToolbar
+            searchValue={list.search}
+            onSearchChange={list.setSearch}
+            searchPlaceholder="Buscar cupón..."
+            action={
+              <button
+                type="button"
+                onClick={openCreate}
+                className="flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold transition-opacity hover:opacity-90 sm:w-auto"
+                style={{ backgroundColor: 'var(--admin-accent)', color: 'var(--admin-bg)' }}
+              >
+                <FiPlus size={16} />
+                Nuevo cupón
+              </button>
+            }
+          />
         }
       />
 
@@ -265,11 +284,24 @@ export default function CuponesDashboard() {
         ) : error ? (
           <p className="py-12 text-center text-sm text-red-400">{error}</p>
         ) : (
-          <AdminTable
-            columns={columns}
-            rows={cupones.map((c) => ({ ...c, id: c.id_cupon }))}
-            emptyMessage="No hay cupones registrados."
-          />
+          <>
+            <AdminTable
+              columns={columns}
+              rows={list.paginated.map((c) => ({ ...c, id: c.id_cupon }))}
+              emptyMessage={
+                list.hasSearch
+                  ? 'No se encontraron cupones con esa búsqueda.'
+                  : 'No hay cupones registrados.'
+              }
+            />
+            <AdminPagination
+              page={list.page}
+              totalPages={list.totalPages}
+              totalItems={list.totalItems}
+              pageSize={list.pageSize}
+              onPageChange={list.setPage}
+            />
+          </>
         )}
       </div>
 

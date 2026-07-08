@@ -58,7 +58,10 @@ export default function AdminLayout() {
               className="relative z-10 flex h-full w-[min(280px,85vw)] flex-col overflow-y-auto border-r px-3 py-6 shadow-2xl"
               style={{ backgroundColor: 'var(--admin-bg)', borderColor: 'var(--admin-border)' }}
             >
-              <AdminSidebar onNavigate={() => setIsMenuOpen(false)} />
+              <AdminSidebar
+                onNavigate={() => setIsMenuOpen(false)}
+                onClose={() => setIsMenuOpen(false)}
+              />
             </aside>
           </div>
         )}

@@ -1,7 +1,7 @@
 export default function AdminPageHeader({ title, description, action }) {
   return (
     <header className="min-w-0 flex-1">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0">
           <h1 className="text-xl font-extrabold tracking-tight sm:text-2xl">{title}</h1>
           {description && (
@@ -10,7 +10,7 @@ export default function AdminPageHeader({ title, description, action }) {
             </p>
           )}
         </div>
-        {action && <div className="shrink-0">{action}</div>}
+        {action && <div className="w-full min-w-0 lg:max-w-xl lg:flex-1">{action}</div>}
       </div>
     </header>
   )
