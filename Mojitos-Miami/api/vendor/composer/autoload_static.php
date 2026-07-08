@@ -33,7 +33,7 @@ class ComposerStaticInit055bfdf2173c3ec177a5b94f0b2a61ff
         ),
         'A' =>
         array (
-            'Alexis\\MojitosMiami\\' => 20,
+            'App\\' => 4,
         ),
     );
 
@@ -62,7 +62,7 @@ class ComposerStaticInit055bfdf2173c3ec177a5b94f0b2a61ff
         array (
             0 => __DIR__ . '/..' . '/vlucas/phpdotenv/src',
         ),
-        'Alexis\\MojitosMiami\\' =>
+        'App\\' =>
         array (
             0 => __DIR__ . '/../..' . '/app',
         ),

@@ -1,7 +1,7 @@
 import { FiBookOpen, FiHome } from 'react-icons/fi'
 import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import { navLinks } from '@/data/menuData'
-import { siteConfig } from '@/data/siteConfig'
+import { useConfigStore } from '@/store/configStore'
 import { useUiStore } from '@/store/uiStore'
 import { cn } from '@/utils'
 import styles from './Sidebar.module.css'
@@ -12,6 +12,7 @@ const navIcons = {
 }
 
 export default function Sidebar() {
+  const site = useConfigStore((state) => state.site)
   const activeNav = useUiStore((state) => state.activeNav)
   const setActiveNav = useUiStore((state) => state.setActiveNav)
   const isSidebarOpen = useUiStore((state) => state.isSidebarOpen)
@@ -33,8 +34,8 @@ export default function Sidebar() {
       <aside className={cn(styles.sidebar, isSidebarOpen && styles.sidebarOpen)}>
        <div className={styles.logo}>
   <img
-    src={siteConfig.logo}
-    alt={siteConfig.name}
+    src={site.logo}
+    alt={site.name}
     className={styles.logoImage}
   />
 </div>
@@ -63,7 +64,7 @@ export default function Sidebar() {
 
         <div className={styles.social}>
           <a
-            href={siteConfig.social.instagram}
+            href={site.social.instagram}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram"
@@ -71,7 +72,7 @@ export default function Sidebar() {
             <FaInstagram aria-hidden="true" />
           </a>
           <a
-            href={siteConfig.social.facebook}
+            href={site.social.facebook}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Facebook"
@@ -79,7 +80,7 @@ export default function Sidebar() {
             <FaFacebook aria-hidden="true" />
           </a>
           <a
-            href={siteConfig.social.whatsapp}
+            href={site.social.whatsapp}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="WhatsApp"

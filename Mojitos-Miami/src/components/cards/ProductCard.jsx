@@ -5,6 +5,7 @@ import toast from 'react-hot-toast'
 import ProductTags from '@/components/cards/ProductTags'
 import { useCartStore } from '@/store/cartStore'
 import { useUiStore } from '@/store/uiStore'
+import { useProductPricing } from '@/hooks/useProductPricing'
 import { formatPrice, cn } from '@/utils'
 import styles from './ProductCard.module.css'
 
@@ -15,19 +16,32 @@ function ProductCard({ product, priority = false }) {
 
   const [quantity, setQuantity] = useState(1)
   const [imageLoaded, setImageLoaded] = useState(false)
+  const pricing = useProductPricing(product)
+  const displayProduct = { ...product, discountLabel: pricing.discountLabel }
 
   const handleAdd = () => {
-    addItem(product, quantity)
+    if (product.usa_variantes) {
+      openProductDetail(product)
+      toast('Elige el sabor en el detalle del producto', { icon: '🍹' })
+      return
+    }
+
+    addItem({ ...product, price: pricing.displayPrice }, quantity)
     toast.success(`${quantity}x ${product.name} agregado al carrito`)
   }
 
   const handleOrder = () => {
+    if (product.usa_variantes) {
+      openProductDetail(product)
+      return
+    }
+
     openOrderModal(
       [
         {
           id: product.id,
           name: product.name,
-          price: product.price,
+          price: pricing.displayPrice,
           quantity,
           category: product.category,
           image: product.image,
@@ -35,6 +49,7 @@ function ProductCard({ product, priority = false }) {
           variantId: null,
           variantName: null,
           variants: [],
+          usa_variantes: Boolean(product.usa_variantes),
         },
       ],
       'product',
@@ -57,7 +72,7 @@ function ProductCard({ product, priority = false }) {
           <span className={styles.imageSkeleton} aria-hidden="true" />
         )}
 
-        <ProductTags product={product} layout="overlay" />
+        <ProductTags product={displayProduct} layout="overlay" />
 
         <img
           src={product.image}
@@ -78,7 +93,9 @@ function ProductCard({ product, priority = false }) {
 
         <div className={styles.priceRow}>
           <span className={styles.price}>
-            {formatPrice(product.price)}
+            {product.usa_variantes
+              ? `Desde ${formatPrice(pricing.displayPrice)}`
+              : formatPrice(pricing.displayPrice)}
           </span>
 
           <button

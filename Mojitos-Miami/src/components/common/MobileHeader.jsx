@@ -1,9 +1,10 @@
 import { FiChevronDown, FiMenu } from 'react-icons/fi'
-import { siteConfig } from '@/data/siteConfig'
+import { useConfigStore } from '@/store/configStore'
 import { useUiStore } from '@/store/uiStore'
 import styles from './MobileHeader.module.css'
 
 export default function MobileHeader() {
+  const site = useConfigStore((state) => state.site)
   const toggleSidebar = useUiStore((state) => state.toggleSidebar)
 
   return (
@@ -19,8 +20,8 @@ export default function MobileHeader() {
 
       <div className={styles.logo}>
         <img
-          src={siteConfig.logo}
-          alt={siteConfig.name}
+          src={site.logo}
+          alt={site.name}
           className={styles.logoImage}
         />
       </div>

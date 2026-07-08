@@ -1,18 +1,7 @@
-import {
-  alcoholIntensities,
-  deliveryModes,
-  extraIngredients,
-  MAX_EXTRAS,
-  DELIVERY_FEE,
-  paymentMethods,
-  validCoupons,
-} from '@/data/orderConfig'
+import { DELIVERY_FEE } from '@/data/orderConfig'
 import { formatPrice } from '@/utils'
 import { buildWhatsAppUrl } from '@/services/whatsapp'
-
-export function productNeedsIntensity(category) {
-  return category !== 'sin-alcohol'
-}
+import { validateCupon } from '@/services/api'
 
 export function createOrderDraft(lines) {
   return {
@@ -26,17 +15,15 @@ export function createOrderDraft(lines) {
       price: line.price,
       quantity: line.quantity,
       category: line.category ?? null,
-      intensity: productNeedsIntensity(line.category) ? null : undefined,
+      usa_variantes: Boolean(line.usa_variantes),
     })),
-    extras: [],
     hasCoupon: false,
     couponCode: '',
     couponValidated: false,
+    coupon: null,
     customerName: '',
     customerPhone: '',
     customerEmail: '',
-    paymentMethod: 'transferencia',
-    deliveryMode: 'retiro',
     deliveryAddress: '',
   }
 }
@@ -50,22 +37,41 @@ function isValidPhone(phone) {
   return /^\d{8}$/.test(phone.replace(/\s/g, ''))
 }
 
-export function validateCouponCode(code) {
-  const normalized = code.trim().toUpperCase()
-  if (!normalized) return null
-  return validCoupons[normalized] ?? null
+function buildValidationPayload(draft) {
+  const subtotal = draft.lines.reduce(
+    (sum, line) => sum + line.price * line.quantity,
+    0,
+  )
+
+  return {
+    codigo: draft.couponCode.trim(),
+    subtotal,
+    delivery_fee: DELIVERY_FEE,
+    lineas: draft.lines.map((line) => ({
+      product_id: line.productId,
+      categoria_id: line.category != null ? Number(line.category) : null,
+      precio: line.price,
+      cantidad: line.quantity,
+    })),
+  }
+}
+
+export async function validateCouponForDraft(draft) {
+  const result = await validateCupon(buildValidationPayload(draft))
+
+  return {
+    ...result,
+    code: result.cupon?.codigo ?? draft.couponCode.trim().toUpperCase(),
+    description: result.cupon?.descripcion ?? '',
+  }
 }
 
 export function isOrderDraftValid(draft) {
   if (!draft?.lines?.length) return false
 
   const itemsValid = draft.lines.every((line) => {
-    const intensityValid = !productNeedsIntensity(line.category) ||
-      alcoholIntensities.some((option) => option.id === line.intensity)
-
-    const variantValid = !line.variants?.length || line.variantId !== null
-
-    return intensityValid && variantValid
+    if (!line.usa_variantes) return true
+    return line.variantId != null && Boolean(line.variantName)
   })
 
   const customerValid =
@@ -77,8 +83,7 @@ export function isOrderDraftValid(draft) {
     !draft.hasCoupon ||
     (draft.couponCode.trim().length > 0 && draft.couponValidated)
 
-  const deliveryValid =
-    draft.deliveryMode !== 'delivery' || draft.deliveryAddress.trim().length >= 5
+  const deliveryValid = draft.deliveryAddress.trim().length >= 5
 
   return itemsValid && customerValid && couponValid && deliveryValid
 }
@@ -89,37 +94,25 @@ export function calculateOrderTotals(draft) {
     0,
   )
 
-  const extrasTotal = draft.extras.reduce((sum, extraId) => {
-    const extra = extraIngredients.find((item) => item.id === extraId)
-    return sum + (extra?.price ?? 0)
-  }, 0)
+  let deliveryFee = DELIVERY_FEE
+  let subtotalDiscount = 0
+  let deliveryDiscount = 0
 
-  const deliveryFee = draft.deliveryMode === 'delivery' ? DELIVERY_FEE : 0
+  if (draft.hasCoupon && draft.couponValidated && draft.coupon) {
+    subtotalDiscount = Number(draft.coupon.subtotalDiscount ?? 0)
+    deliveryDiscount = Number(draft.coupon.deliveryDiscount ?? 0)
+    deliveryFee = Number(draft.coupon.deliveryFee ?? DELIVERY_FEE)
+  }
+
+  const total = Math.max(0, subtotal - subtotalDiscount + deliveryFee)
 
   return {
     subtotal,
-    extrasTotal,
+    subtotalDiscount,
+    deliveryDiscount,
     deliveryFee,
-    total: subtotal + extrasTotal + deliveryFee,
+    total,
   }
-}
-
-export function toggleExtraSelection(extras, extraId) {
-  if (extras.includes(extraId)) {
-    return extras.filter((id) => id !== extraId)
-  }
-
-  if (extras.length >= MAX_EXTRAS) return extras
-
-  return [...extras, extraId]
-}
-
-function getPaymentLabel(paymentMethod) {
-  return paymentMethods.find((method) => method.id === paymentMethod)?.label ?? paymentMethod
-}
-
-function getDeliveryLabel(deliveryMode) {
-  return deliveryModes.find((mode) => mode.id === deliveryMode)?.label ?? deliveryMode
 }
 
 export function buildConfirmOrderMessage(draft) {
@@ -127,18 +120,7 @@ export function buildConfirmOrderMessage(draft) {
 
   draft.lines.forEach((line) => {
     const variantLabel = line.variantName ? ` - ${line.variantName}` : ''
-    let itemLine = `${line.quantity} x ${line.name}${variantLabel} (${formatPrice(line.price)} c/u)`
-
-    if (line.intensity) {
-      const intensityLabel = alcoholIntensities.find(
-        (option) => option.id === line.intensity,
-      )?.label
-
-      if (intensityLabel) {
-        itemLine += ` — Alcohol: ${intensityLabel.toLowerCase()}`
-      }
-    }
-
+    const itemLine = `${line.quantity} x ${line.name}${variantLabel} (${formatPrice(line.price)} c/u)`
     lines.push(itemLine)
   })
 
@@ -150,34 +132,24 @@ export function buildConfirmOrderMessage(draft) {
     lines.push(`*Correo:* ${draft.customerEmail.trim()}`)
   }
 
-  lines.push('', `*Método de pago:* ${getPaymentLabel(draft.paymentMethod)}`)
+  lines.push('', '*Método de pago:* Transferencia')
 
-  const { subtotal, extrasTotal, deliveryFee, total } = calculateOrderTotals(draft)
+  const { subtotal, subtotalDiscount, deliveryFee, deliveryDiscount, total } =
+    calculateOrderTotals(draft)
 
   lines.push(`*Subtotal:* ${formatPrice(subtotal)}`)
 
-  if (draft.extras.length > 0) {
-    lines.push('', '*Ingredientes extras:*')
-
-    draft.extras.forEach((extraId) => {
-      const extra = extraIngredients.find((item) => item.id === extraId)
-      if (extra) {
-        lines.push(`• ${extra.name} (${formatPrice(extra.price)})`)
-      }
-    })
-
-    lines.push('', `*Extras total:* +${formatPrice(extrasTotal)}`)
+  if (subtotalDiscount > 0) {
+    lines.push(`*Descuento:* -${formatPrice(subtotalDiscount)}`)
   }
 
-  if (deliveryFee > 0) {
-    lines.push('', `*Delivery:* +${formatPrice(deliveryFee)}`)
+  if (deliveryDiscount > 0) {
+    lines.push(`*Delivery:* Gratis (cupón aplicado)`)
+  } else {
+    lines.push(`*Delivery:* +${formatPrice(deliveryFee)}`)
   }
 
-  lines.push(`*Modalidad:* ${getDeliveryLabel(draft.deliveryMode)}`)
-
-  if (draft.deliveryMode === 'delivery') {
-    lines.push(`*Dirección:* ${draft.deliveryAddress.trim()}`)
-  }
+  lines.push(`*Dirección:* ${draft.deliveryAddress.trim()}`)
 
   if (draft.hasCoupon && draft.couponValidated) {
     lines.push(`*Cupón:* ${draft.couponCode.trim().toUpperCase()}`)

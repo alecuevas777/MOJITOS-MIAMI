@@ -2,7 +2,7 @@
     "name": "alexis/mojitos-miami",
     "autoload": {
         "psr-4": {
-            "Alexis\\MojitosMiami\\": "app/"
+            "App\\": "app/"
         }
     },
     "authors": [

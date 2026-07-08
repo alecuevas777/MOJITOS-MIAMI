@@ -32,13 +32,13 @@
 
 .closeBtn {
   position: absolute;
-  top: 0.75rem;
+  top: max(0.75rem, env(safe-area-inset-top, 0px));
   right: 0.75rem;
   z-index: 3;
   display: grid;
   place-items: center;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2.5rem;
+  height: 2.5rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background-color: rgba(0, 0, 0, 0.65);
@@ -58,7 +58,7 @@
   flex-shrink: 0;
   width: 100%;
   aspect-ratio: 16 / 10;
-  max-height: 38vh;
+  max-height: min(34vh, 14rem);
   background-color: var(--color-surface-3);
 }
 
@@ -78,8 +78,9 @@
 .scrollBody {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem 1.25rem 0.75rem;
+  padding: 1rem 1rem 0.75rem;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .category {
@@ -114,20 +115,32 @@
 }
 
 .variantSection {
-  margin-top: 1rem;
+  margin-top: 1.125rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.variantHeader {
+  margin-bottom: 0.875rem;
 }
 
 .variantTitle {
-  margin-bottom: 0.75rem;
-  font-size: 0.9rem;
+  font-size: 0.9375rem;
   font-weight: 800;
+  letter-spacing: 0.01em;
   color: var(--color-text);
+}
+
+.variantSubtitle {
+  margin-top: 0.25rem;
+  font-size: 0.8125rem;
+  color: var(--color-text-dim);
 }
 
 .variantHint,
 .variantError {
   margin-top: 0.5rem;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   color: var(--color-text-muted);
 }
 
@@ -137,7 +150,12 @@
 
 .variantOptions {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.5rem;
+  max-height: min(180px, 30vh);
+  overflow-y: auto;
+  padding-right: 0.125rem;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .variantOption,
@@ -147,50 +165,66 @@
   justify-content: space-between;
   gap: 0.75rem;
   width: 100%;
-  padding: 0.85rem 1rem;
+  min-height: 3rem;
+  padding: 0.75rem 0.875rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background-color: var(--color-surface-2);
   color: var(--color-text);
-  font-weight: 700;
+  text-align: left;
   transition:
     border-color var(--transition),
     background-color var(--transition),
-    color var(--transition);
+    box-shadow var(--transition);
 }
 
 .variantOption:hover {
-  border-color: var(--color-primary);
+  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-border));
 }
 
 .variantOptionActive {
   border-color: var(--color-primary);
-  background-color: rgba(184, 240, 74, 0.12);
+  background-color: rgba(184, 240, 74, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(184, 240, 74, 0.25);
 }
 
-.variantOption strong {
+.variantOptionName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.3;
+  min-width: 0;
+}
+
+.variantOptionPrice {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--color-primary);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .footerActions {
   flex-shrink: 0;
-  padding: 0.75rem 1.25rem calc(1rem + env(safe-area-inset-bottom, 0px));
+  padding: 0.75rem 1rem calc(0.875rem + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--color-border);
   background-color: var(--color-surface);
 }
 
 .actionsRow {
   display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  gap: 0.625rem;
+  grid-template-columns: 1fr;
+  align-items: stretch;
+  gap: 0.5rem;
 }
 
 .quantity {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.375rem;
-  padding: 0.375rem 0.625rem;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.375rem 0.75rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-full);
   background-color: var(--color-surface-2);
@@ -206,8 +240,8 @@
 .quantity button {
   display: grid;
   place-items: center;
-  width: 2rem;
-  height: 2rem;
+  width: 2.75rem;
+  height: 2.75rem;
   color: var(--color-text-muted);
   transition: color var(--transition);
 }
@@ -228,11 +262,12 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  min-height: 2.75rem;
-  padding: 0.625rem 1rem;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.75rem 1rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-full);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 700;
   color: var(--color-text);
   transition:
@@ -251,8 +286,8 @@
   justify-content: center;
   gap: 0.625rem;
   width: 100%;
-  min-height: 3rem;
-  margin-top: 0.625rem;
+  min-height: 3.25rem;
+  margin-top: 0.5rem;
   padding: 0.875rem 1rem;
   border-radius: var(--radius-full);
   background-color: var(--color-primary);
@@ -270,7 +305,14 @@
     background-color var(--transition);
 }
 
-.orderBtn:hover {
+.orderBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.orderBtn:hover:not(:disabled) {
   transform: translateY(-1px);
   background-color: var(--color-primary-dark);
 }
@@ -328,6 +370,44 @@
     padding: 0.75rem 1.25rem 1.25rem;
   }
 
+  .actionsRow {
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .quantity {
+    display: inline-flex;
+    justify-content: center;
+    width: auto;
+    min-height: 2.75rem;
+    padding: 0.375rem 0.625rem;
+  }
+
+  .quantity button {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .addBtn {
+    width: auto;
+    min-height: 2.75rem;
+    font-size: 0.75rem;
+  }
+
+  .orderBtn {
+    min-height: 3rem;
+    margin-top: 0.625rem;
+  }
+
+  .imageWrap {
+    max-height: none;
+  }
+
+  .variantOptions {
+    max-height: min(220px, 38vh);
+  }
+
   .name {
     padding-right: 0;
   }
@@ -337,21 +417,6 @@
   .modal {
     width: min(100%, 46rem);
     max-height: min(86vh, 30rem);
-  }
-}
-
-@media (max-width: 380px) {
-  .actionsRow {
-    grid-template-columns: 1fr;
-  }
-
-  .quantity {
-    justify-content: center;
-    width: 100%;
-  }
-
-  .addBtn {
-    width: 100%;
   }
 }
 

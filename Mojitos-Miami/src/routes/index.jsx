@@ -1,17 +1,16 @@
 import { createBrowserRouter } from 'react-router-dom'
 import Catalog from '@/pages/Catalog'
-import Admin from '@/pages/Admin'
+import { adminRoutes } from '@/pages/Admin'
+import '@/store/authStore'
+
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <Catalog />,
   },
+  ...adminRoutes,
   {
     path: '*',
     element: <Catalog />,
   },
-  {
-    path: '/admin',
-    element: <Admin />,
-  }
 ])

@@ -3,11 +3,12 @@ import { FiMinus, FiPlus, FiShoppingCart, FiX } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
 import toast from 'react-hot-toast'
 import ProductTags from '@/components/cards/ProductTags'
-import { useMenuStore } from '@/store/menuStore'
+import { useMenuStore, mapVariante } from '@/store/menuStore'
 import { useCartStore } from '@/store/cartStore'
 import { useUiStore } from '@/store/uiStore'
 import { getProductById } from '@/services/api'
-import { formatPrice } from '@/utils'
+import { useProductPricing, useVariantPricing } from '@/hooks/useProductPricing'
+import { formatPrice, getVariantPricing, PLACEHOLDER, resolveVariantImage } from '@/utils'
 import styles from './ProductDetailModal.module.css'
 
 export default function ProductDetailModal() {
@@ -21,6 +22,9 @@ export default function ProductDetailModal() {
   const [selectedVariant, setSelectedVariant] = useState(null)
   const [isLoadingVariants, setIsLoadingVariants] = useState(false)
   const [variantsError, setVariantsError] = useState('')
+  const [imageError, setImageError] = useState(false)
+  const pricing = useProductPricing(product)
+  const variantPricing = useVariantPricing(product, selectedVariant)
 
   useEffect(() => {
     if (product) {
@@ -55,15 +59,10 @@ export default function ProductDetailModal() {
       setVariantsError('')
 
       try {
-        if (product.variantes?.length) {
-          setVariants(product.variantes)
-          setSelectedVariant(product.variantes[0])
-          return
-        }
-
-        const data = await getProductById(product.id)
-        setVariants(data.variantes ?? [])
-        setSelectedVariant(data.variantes?.[0] ?? null)
+        const detail = await getProductById(product.id)
+        const loaded = (detail.variantes ?? []).map(mapVariante)
+        setVariants(loaded)
+        setSelectedVariant(loaded[0] ?? null)
       } catch (error) {
         setVariantsError('No se pudo cargar las variantes.')
       } finally {
@@ -74,14 +73,23 @@ export default function ProductDetailModal() {
     loadVariants()
   }, [product])
 
+  const displayImage = product
+    ? product.usa_variantes
+      ? resolveVariantImage(selectedVariant, product.image)
+      : product.image
+    : PLACEHOLDER
+
+  useEffect(() => {
+    setImageError(false)
+  }, [displayImage])
+
   if (!product) return null
 
   const categoryName =
     categories.find((cat) => cat.id === product.category)?.name ?? null
 
-  const currentPrice = product.usa_variantes
-    ? Number(selectedVariant?.precio ?? product.precio_base ?? product.price)
-    : product.price
+  const currentPrice = variantPricing.displayPrice
+  const displayProduct = { ...product, discountLabel: pricing.discountLabel }
 
   const hasVariants = product.usa_variantes && variants.length > 0
   const isVariantSelectionMissing = product.usa_variantes && variants.length > 0 && !selectedVariant
@@ -93,14 +101,18 @@ export default function ProductDetailModal() {
         return
       }
 
-      addItem(product, quantity, selectedVariant)
+      addItem(
+        { ...product, price: variantPricing.displayPrice },
+        quantity,
+        { ...selectedVariant, precio: variantPricing.displayPrice },
+      )
       toast.success(
         `${quantity}x ${product.name} ${selectedVariant.nombre_variante} agregado al carrito`,
       )
       return
     }
 
-    addItem(product, quantity)
+    addItem({ ...product, price: pricing.displayPrice }, quantity)
     toast.success(`${quantity}x ${product.name} agregado al carrito`)
   }
 
@@ -114,11 +126,12 @@ export default function ProductDetailModal() {
           variantId: selectedVariant?.id ?? null,
           variantName: selectedVariant?.nombre_variante ?? null,
           variants,
+          usa_variantes: Boolean(product.usa_variantes),
           name: product.name,
           price: currentPrice,
           quantity,
           category: product.category,
-          image: product.image,
+          image: displayImage,
         },
       ],
       'product',
@@ -145,8 +158,14 @@ export default function ProductDetailModal() {
         </button>
 
         <div className={styles.imageWrap}>
-          <img src={product.image} alt={product.name} loading="lazy" />
-          <ProductTags product={product} layout="overlay" />
+          <img
+            key={displayImage}
+            src={imageError ? PLACEHOLDER : displayImage}
+            alt={selectedVariant ? `${product.name} - ${selectedVariant.nombre_variante}` : product.name}
+            loading="lazy"
+            onError={() => setImageError(true)}
+          />
+          <ProductTags product={displayProduct} layout="overlay" />
         </div>
 
         <div className={styles.content}>
@@ -158,13 +177,18 @@ export default function ProductDetailModal() {
             <p className={styles.description}>{product.description}</p>
             <p className={styles.price}>
               {product.usa_variantes
-                ? `Desde ${formatPrice(product.precio_base ?? currentPrice)}`
-                : formatPrice(currentPrice)}
+                ? selectedVariant
+                  ? formatPrice(variantPricing.displayPrice)
+                  : `Desde ${formatPrice(pricing.displayPrice)}`
+                : formatPrice(pricing.displayPrice)}
             </p>
 
             {product.usa_variantes && (
               <section className={styles.variantSection}>
-                <p className={styles.variantTitle}>Elige tu sabor</p>
+                <div className={styles.variantHeader}>
+                  <p className={styles.variantTitle}>Elige tu sabor</p>
+                  <p className={styles.variantSubtitle}>Selecciona una opción para continuar</p>
+                </div>
                 {isLoadingVariants ? (
                   <p className={styles.variantHint}>Cargando opciones...</p>
                 ) : variantsError ? (
@@ -174,22 +198,26 @@ export default function ProductDetailModal() {
                     No hay variantes disponibles en este momento.
                   </p>
                 ) : (
-                  <div className={styles.variantOptions}>
-                    {variants.map((variant) => (
-                      <button
-                        key={variant.id}
-                        type="button"
-                        className={
-                          variant.id === selectedVariant?.id
-                            ? styles.variantOptionActive
-                            : styles.variantOption
-                        }
-                        onClick={() => setSelectedVariant(variant)}
-                      >
-                        <span>{variant.nombre_variante}</span>
-                        <strong>{formatPrice(variant.precio)}</strong>
-                      </button>
-                    ))}
+                  <div className={styles.variantOptions} role="listbox" aria-label="Sabores disponibles">
+                    {variants.map((variant) => {
+                      const isSelected = variant.id === selectedVariant?.id
+
+                      return (
+                        <button
+                          key={variant.id}
+                          type="button"
+                          role="option"
+                          aria-selected={isSelected}
+                          className={isSelected ? styles.variantOptionActive : styles.variantOption}
+                          onClick={() => setSelectedVariant(variant)}
+                        >
+                          <span className={styles.variantOptionName}>{variant.nombre_variante}</span>
+                          <strong className={styles.variantOptionPrice}>
+                            {formatPrice(getVariantPricing(variant, pricing).displayPrice)}
+                          </strong>
+                        </button>
+                      )
+                    })}
                   </div>
                 )}
               </section>

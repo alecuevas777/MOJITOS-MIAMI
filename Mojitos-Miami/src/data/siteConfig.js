@@ -15,7 +15,12 @@ export const siteConfig = {
   mapUrl: 'https://maps.google.com/?q=Gabriela+Mistral+1782,+Coronel',
   hours: 'Lunes a Domingo 17:00 a 02:00 hrs',
   happyHour: 'Lunes a Jueves 17:00 a 20:00 hrs',
-  isOpen: true,
+  schedule: {
+    openHour: 17,
+    openMinute: 0,
+    closeHour: 2,
+    closeMinute: 0,
+  },
 
   social: {
     instagram: 'https://instagram.com/mojitobar',

@@ -4,19 +4,58 @@
   border-bottom: 1px solid var(--color-border);
 }
 
-.label {
+.labelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
   margin-bottom: 0.75rem;
+}
+
+.label {
   font-size: 0.6875rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--color-text-dim);
+}
+
+.scrollHint {
+  display: none;
+  align-items: center;
+  gap: 0.15rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-dim);
+}
+
+.scrollHintIcon {
+  animation: nudge-x 1.6s ease-in-out infinite;
+}
+
+@keyframes nudge-x {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(3px);
+  }
+}
+
+.scrollWrap {
+  position: relative;
 }
 
 .scroll {
   display: flex;
   gap: 0.5rem;
   overflow-x: auto;
-  padding-bottom: 0.25rem;
+  padding-bottom: 0.35rem;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -27,6 +66,7 @@
 
 .pill {
   flex-shrink: 0;
+  scroll-snap-align: start;
   padding: 0.5rem 1rem;
   border-radius: var(--radius-full);
   background-color: var(--color-surface-2);
@@ -53,4 +93,30 @@
 .pillActive:hover {
   background-color: var(--color-primary);
   color: var(--color-bg);
+}
+
+.fadeEdge {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0.35rem;
+  width: 2.75rem;
+  background: linear-gradient(to right, transparent, var(--color-bg));
+}
+
+@media (max-width: 639px) {
+  .scrollHint {
+    display: flex;
+  }
+
+  .scroll {
+    padding-right: 0.5rem;
+  }
+}
+
+@media (min-width: 640px) {
+  .fadeEdge {
+    display: none;
+  }
 }

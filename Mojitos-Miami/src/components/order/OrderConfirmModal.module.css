@@ -2,9 +2,10 @@
   position: fixed;
   inset: 0;
   z-index: 120;
-  display: grid;
-  place-items: center;
-  padding: 1.25rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
 }
 
 .overlay {
@@ -19,42 +20,62 @@
   z-index: 1;
   display: flex;
   flex-direction: column;
-  width: min(100%, 26rem);
-  max-height: min(92vh, 44rem);
+  width: 100%;
+  max-height: min(94dvh, 44rem);
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
   box-shadow: var(--shadow-md);
-  animation: scaleIn 240ms ease;
+  animation: slideUp 280ms ease;
+  overflow: hidden;
 }
 
 .header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 1.25rem 1.25rem 0.75rem;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  padding: 1rem 1rem 0.75rem;
+  padding-top: max(1rem, env(safe-area-inset-top, 0px));
   border-bottom: 1px solid var(--color-border);
 }
 
+.header > div:first-child {
+  min-width: 0;
+  flex: 1;
+}
+
 .title {
-  font-size: 1.125rem;
+  font-size: clamp(1rem, 4.5vw, 1.125rem);
   font-weight: 800;
   color: var(--color-text);
+  line-height: 1.25;
 }
 
 .summary {
-  margin-top: 0.375rem;
+  margin: 0.375rem 0 0;
+  padding: 0;
+  list-style: none;
   font-size: 0.8125rem;
   color: var(--color-text-muted);
   line-height: 1.5;
 }
 
+.summary li + li {
+  margin-top: 0.25rem;
+}
+
+.summary li {
+  word-break: break-word;
+}
+
 .closeBtn {
   display: grid;
   place-items: center;
-  width: 2rem;
-  height: 2rem;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   color: var(--color-text-muted);
@@ -70,8 +91,11 @@
 
 .body {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  padding: 1rem 1.25rem;
+  padding: 0.875rem 1rem 1rem;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .section + .section {
@@ -173,18 +197,21 @@
 
 .couponToggle {
   display: grid;
-  grid-template-columns: 1fr 1.4fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.5rem;
   margin-top: 0.625rem;
 }
 
 .couponBtn {
-  padding: 0.75rem 0.875rem;
+  min-height: 2.75rem;
+  padding: 0.625rem 0.75rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-full);
   background-color: var(--color-surface-2);
-  font-size: 0.8125rem;
+  font-size: clamp(0.75rem, 3.2vw, 0.8125rem);
   font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
   color: var(--color-text);
   transition:
     border-color var(--transition),
@@ -200,6 +227,8 @@
 
 .couponInput {
   flex: 1;
+  min-width: 0;
+  min-height: 2.75rem;
   padding: 0.75rem 0.875rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -210,12 +239,14 @@
 
 .couponRow {
   display: flex;
+  flex-direction: column;
   gap: 0.5rem;
   margin-top: 0.625rem;
 }
 
 .validateBtn {
-  flex-shrink: 0;
+  width: 100%;
+  min-height: 2.75rem;
   padding: 0.75rem 1rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-full);
@@ -261,11 +292,12 @@
 
 .fieldInput {
   width: 100%;
+  min-height: 2.75rem;
   padding: 0.75rem 0.875rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background-color: var(--color-surface-2);
-  font-size: 0.875rem;
+  font-size: 1rem;
   color: var(--color-text);
 }
 
@@ -283,12 +315,16 @@
 
 .phoneRow {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: 0.5rem;
+  min-width: 0;
 }
 
 .phonePrefix {
+  display: flex;
+  align-items: center;
   flex-shrink: 0;
+  min-height: 2.75rem;
   padding: 0.75rem 0.625rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -296,15 +332,18 @@
   font-size: 0.8125rem;
   font-weight: 600;
   color: var(--color-text-muted);
+  white-space: nowrap;
 }
 
 .phoneInput {
   flex: 1;
+  min-width: 0;
+  min-height: 2.75rem;
   padding: 0.75rem 0.875rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background-color: var(--color-surface-2);
-  font-size: 0.875rem;
+  font-size: 1rem;
   color: var(--color-text);
 }
 
@@ -412,8 +451,10 @@
 }
 
 .footer {
-  padding: 0.75rem 1.25rem 1.25rem;
+  flex-shrink: 0;
+  padding: 0.75rem 1rem calc(0.875rem + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--color-border);
+  background-color: var(--color-surface);
 }
 
 .submitBtn {
@@ -422,6 +463,7 @@
   justify-content: center;
   gap: 0.625rem;
   width: 100%;
+  min-height: 3.25rem;
   padding: 0.9375rem 1rem;
   border-radius: var(--radius-full);
   background-color: var(--color-primary);
@@ -469,16 +511,50 @@
   }
 }
 
-@media (max-width: 480px) {
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (min-width: 640px) {
   .root {
-    padding: 0.75rem;
-    align-items: flex-end;
+    align-items: center;
+    padding: 1.25rem;
   }
 
   .modal {
-    width: 100%;
-    max-height: 94vh;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+    width: min(100%, 26rem);
+    max-height: min(92vh, 44rem);
+    border-radius: var(--radius-xl);
+    animation: scaleIn 240ms ease;
+  }
+
+  .header {
+    padding: 1.25rem 1.25rem 0.75rem;
+    padding-top: 1.25rem;
+  }
+
+  .body {
+    padding: 1rem 1.25rem;
+  }
+
+  .couponRow {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .validateBtn {
+    width: auto;
+    flex-shrink: 0;
+  }
+
+  .footer {
+    padding: 0.75rem 1.25rem 1.25rem;
   }
 }
