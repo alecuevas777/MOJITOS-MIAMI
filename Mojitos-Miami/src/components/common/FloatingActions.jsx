@@ -1,19 +1,23 @@
 import { FiShoppingCart } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useCartStore } from '@/store/cartStore'
+import { useConfigStore } from '@/store/configStore'
 import { useUiStore } from '@/store/uiStore'
 import { buildWhatsAppUrl } from '@/services/whatsapp'
 import styles from './FloatingActions.module.css'
-
-const defaultMessage = '¡Hola! Quiero hacer un pedido en Mojito Bar.'
 
 export default function FloatingActions() {
   const openCart = useUiStore((state) => state.openCart)
   const itemCount = useCartStore((state) =>
     state.items.reduce((count, item) => count + item.quantity, 0),
   )
+  // Teléfono de pedidos del admin (Contacto y redes → WhatsApp)
+  const phone = useConfigStore((state) => state.site.phone)
+  const siteName = useConfigStore((state) => state.site.name)
 
-  const whatsappUrl = buildWhatsAppUrl(defaultMessage)
+  const whatsappUrl = buildWhatsAppUrl(
+    `¡Hola! Quiero hacer un pedido en ${siteName || 'Mojitos Miami'}.`,
+  )
 
   return (
     <div className={styles.fabGroup} aria-label="Acciones rápidas">
@@ -28,6 +32,7 @@ export default function FloatingActions() {
       </button>
 
       <a
+        key={String(phone)}
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"

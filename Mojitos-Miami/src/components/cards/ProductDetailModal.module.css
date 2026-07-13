@@ -68,6 +68,91 @@
   object-fit: cover;
 }
 
+.imagePreviewBtn {
+  position: absolute;
+  left: 0.75rem;
+  bottom: 0.75rem;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  background-color: rgba(0, 0, 0, 0.62);
+  color: #fff;
+  backdrop-filter: blur(6px);
+  transition:
+    background-color var(--transition),
+    border-color var(--transition),
+    transform var(--transition);
+}
+
+.imagePreviewBtn:hover {
+  background-color: rgba(0, 0, 0, 0.78);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  transform: translateY(-1px);
+}
+
+.imageLightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 130;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  padding-top: max(1rem, env(safe-area-inset-top, 0px));
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+}
+
+.imageLightboxBackdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  cursor: zoom-out;
+}
+
+.imageLightboxContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  max-width: min(100%, 42rem);
+  max-height: 100%;
+  animation: fadeIn 180ms ease;
+}
+
+.imageLightboxContent img {
+  display: block;
+  width: 100%;
+  max-height: min(88dvh, 52rem);
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  background-color: #000;
+}
+
+.imageLightboxClose {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: var(--radius-sm);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #fff;
+}
+
+.imageLightboxClose:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
 .content {
   display: flex;
   flex-direction: column;
@@ -147,6 +232,32 @@
 
 .variantError {
   color: var(--color-error);
+}
+
+.variantErrorWrap {
+  display: grid;
+  gap: 0.625rem;
+  margin-top: 0.5rem;
+}
+
+.variantRetryBtn {
+  justify-self: start;
+  padding: 0.45rem 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: transparent;
+  color: var(--color-text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color var(--transition),
+    color var(--transition);
+}
+
+.variantRetryBtn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 
 .variantOptions {

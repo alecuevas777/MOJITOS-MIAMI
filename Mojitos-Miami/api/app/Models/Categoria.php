@@ -13,7 +13,18 @@ class Categoria
     {
         $db = Database::connect();
 
-        $stmt = $db->query('SELECT * FROM categoria ORDER BY nom_categoria ASC');
+        $stmt = $db->query(
+            'SELECT * FROM categoria
+             ORDER BY
+               CASE
+                 WHEN LOWER(nom_categoria) LIKE \'%mojito%\' THEN 0
+                 WHEN LOWER(nom_categoria) LIKE \'%autor%\' THEN 2
+                 WHEN LOWER(nom_categoria) LIKE \'%coctel%\' THEN 1
+                 WHEN LOWER(nom_categoria) LIKE \'%mock%\' THEN 3
+                 ELSE 50
+               END ASC,
+               nom_categoria ASC'
+        );
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

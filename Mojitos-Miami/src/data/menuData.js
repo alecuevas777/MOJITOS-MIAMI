@@ -1,6 +1,7 @@
 export const navLinks = [
   { id: 'inicio', label: 'Inicio', href: '#inicio', icon: 'home' },
   { id: 'carta', label: 'Ver carta', href: '#catalogo', icon: 'book' },
+  { id: 'barra-libre', label: ' Servicios de barra libre', href: '#barra-movil', icon: 'calendar' },
 ]
 
 export const features = [

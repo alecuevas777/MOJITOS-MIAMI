@@ -24,6 +24,10 @@ use App\Controllers\CuponController;
 
 use App\Controllers\ConfiguracionController;
 
+use App\Controllers\DeliveryZonaController;
+
+use App\Controllers\IngredienteExtraController;
+
 
 
 /*
@@ -201,6 +205,54 @@ $router->delete('/cupones/{id}', [CuponController::class, 'destroy']);
 $router->get('/configuracion', [ConfiguracionController::class, 'show']);
 
 $router->put('/configuracion', [ConfiguracionController::class, 'update']);
+
+
+
+/*
+
+|--------------------------------------------------------------------------
+
+| Zonas de delivery
+
+|--------------------------------------------------------------------------
+
+*/
+
+
+
+$router->get('/delivery-zonas', [DeliveryZonaController::class, 'index']);
+
+$router->get('/delivery-zonas/{id}', [DeliveryZonaController::class, 'show']);
+
+$router->post('/delivery-zonas', [DeliveryZonaController::class, 'store']);
+
+$router->put('/delivery-zonas/{id}', [DeliveryZonaController::class, 'update']);
+
+$router->delete('/delivery-zonas/{id}', [DeliveryZonaController::class, 'destroy']);
+
+
+
+/*
+
+|--------------------------------------------------------------------------
+
+| Ingredientes extra
+
+|--------------------------------------------------------------------------
+
+*/
+
+
+
+$router->get('/ingredientes-extra', [IngredienteExtraController::class, 'index']);
+
+$router->get('/ingredientes-extra/{id}', [IngredienteExtraController::class, 'show']);
+
+$router->post('/ingredientes-extra', [IngredienteExtraController::class, 'store']);
+
+$router->put('/ingredientes-extra/{id}', [IngredienteExtraController::class, 'update']);
+
+$router->delete('/ingredientes-extra/{id}', [IngredienteExtraController::class, 'destroy']);
 
 
 

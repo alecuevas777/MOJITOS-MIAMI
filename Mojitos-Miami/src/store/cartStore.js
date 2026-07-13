@@ -13,7 +13,14 @@ export const useCartStore = create(
       items: [],
 
       addItem: (product, quantity = 1, variant = null) => {
-        const itemId = variant ? `${product.id}-${variant.id}` : `${product.id}`
+        const variantIds = Array.isArray(variant?.ids)
+          ? variant.ids
+          : variant?.id != null
+            ? [variant.id]
+            : []
+        const itemId = variantIds.length
+          ? `${product.id}-${[...variantIds].map(String).sort().join('-')}`
+          : `${product.id}`
         const { items } = get()
         const existing = items.find((item) => item.id === itemId)
 
@@ -38,13 +45,17 @@ export const useCartStore = create(
             {
               id: itemId,
               productId: product.id,
-              variantId: variant?.id ?? null,
+              variantId: variantIds.length === 1 ? variantIds[0] : variantIds.join('-') || null,
+              variantIds,
               variantName: variant?.nombre_variante ?? null,
               usa_variantes: Boolean(product.usa_variantes),
               variants: product.variantes ?? [],
               name: product.name,
               price: Number(variant?.precio ?? product.price),
-              image: variant?.image ?? product.image,
+              image:
+                product.mostrar_imagen_variantes && variant?.image
+                  ? variant.image
+                  : product.image,
               category: product.category,
               quantity,
             },

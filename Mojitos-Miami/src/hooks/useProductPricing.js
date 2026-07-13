@@ -1,7 +1,11 @@
 import { useMemo } from 'react'
 import { useConfigStore } from '@/store/configStore'
 import { useMenuStore } from '@/store/menuStore'
-import { getProductPricing, getVariantPricing } from '@/utils/productPricing'
+import {
+  getProductPricing,
+  getSelectedVariantsPricing,
+  getVariantPricing,
+} from '@/utils/productPricing'
 
 const EMPTY_PRICING = {
   discountPercent: 0,
@@ -27,5 +31,15 @@ export function useVariantPricing(product, variant) {
   return useMemo(
     () => (variant ? getVariantPricing(variant, pricing) : pricing),
     [variant, pricing],
+  )
+}
+
+export function useSelectedVariantsPricing(product, variants) {
+  const pricing = useProductPricing(product)
+
+  return useMemo(
+    () =>
+      variants?.length ? getSelectedVariantsPricing(variants, pricing) : pricing,
+    [variants, pricing],
   )
 }

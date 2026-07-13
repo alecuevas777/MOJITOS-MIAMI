@@ -1,6 +1,7 @@
 import { FiClock } from 'react-icons/fi'
-import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
+import { FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import { useConfigStore, formatHoursLabel } from '@/store/configStore'
+import { formatPhone } from '@/utils'
 import styles from './Footer.module.css'
 
 export default function Footer() {
@@ -28,16 +29,6 @@ export default function Footer() {
                 <FaInstagram aria-hidden="true" />
               </a>
             )}
-            {site.social.facebook && (
-              <a
-                href={site.social.facebook}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Facebook"
-              >
-                <FaFacebook aria-hidden="true" />
-              </a>
-            )}
             <a
               href={site.social.whatsapp}
               target="_blank"
@@ -61,7 +52,7 @@ export default function Footer() {
             <FaWhatsapp aria-hidden="true" /> ESCRÍBENOS
           </h3>
           <a href={site.social.whatsapp} className={styles.phone}>
-            +{site.phone}
+            {formatPhone(site.phone)}
           </a>
         </div>
       </div>

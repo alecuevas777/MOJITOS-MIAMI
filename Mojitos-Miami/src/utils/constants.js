@@ -1,9 +1,9 @@
-export const APP_NAME = 'Mojito Bar'
+export const APP_NAME = 'Mojitos Miami'
 
 export const ROUTES = {
   HOME: '/',
 }
 
 export const STORAGE_KEYS = {
-  CART: 'mojito-bar-cart',
+  CART: 'mojitos-miami-cart',
 }

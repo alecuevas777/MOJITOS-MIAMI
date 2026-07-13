@@ -1,5 +1,5 @@
-import { FiBookOpen, FiHome, FiX } from 'react-icons/fi'
-import { FaFacebook, FaInstagram, FaWhatsapp } from 'react-icons/fa'
+import { FiBookOpen, FiCalendar, FiHome, FiX } from 'react-icons/fi'
+import { FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import { navLinks } from '@/data/menuData'
 import { useConfigStore } from '@/store/configStore'
 import { useUiStore } from '@/store/uiStore'
@@ -9,6 +9,7 @@ import styles from './Sidebar.module.css'
 const navIcons = {
   home: FiHome,
   book: FiBookOpen,
+  calendar: FiCalendar,
 }
 
 export default function Sidebar() {
@@ -73,22 +74,16 @@ export default function Sidebar() {
         </nav>
 
         <div className={styles.social}>
-          <a
-            href={site.social.instagram}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Instagram"
-          >
-            <FaInstagram aria-hidden="true" />
-          </a>
-          <a
-            href={site.social.facebook}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Facebook"
-          >
-            <FaFacebook aria-hidden="true" />
-          </a>
+          {site.social.instagram && (
+            <a
+              href={site.social.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+            >
+              <FaInstagram aria-hidden="true" />
+            </a>
+          )}
           <a
             href={site.social.whatsapp}
             target="_blank"

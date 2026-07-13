@@ -18,6 +18,10 @@ import CuponesDashboard from '@/components/admin/ui/CuponesDashboard'
 
 import ConfiguracionDashboard from '@/components/admin/ui/ConfiguracionDashboard'
 
+import DeliveryZonasDashboard from '@/components/admin/ui/DeliveryZonasDashboard'
+
+import IngredientesExtraDashboard from '@/components/admin/ui/IngredientesExtraDashboard'
+
 
 
 export { AdminLayout }
@@ -59,6 +63,10 @@ export const adminRoutes = [
           { path: 'productos', element: <ProductosDashboard /> },
 
           { path: 'cupones', element: <CuponesDashboard /> },
+
+          { path: 'delivery-zonas', element: <DeliveryZonasDashboard /> },
+
+          { path: 'ingredientes-extra', element: <IngredientesExtraDashboard /> },
 
           { path: 'configuracion', element: <ConfiguracionDashboard /> },
 

@@ -31,7 +31,7 @@ api.interceptors.response.use(
 )
 
 export async function getProductos() {
-  const { data } = await api.get('/productos', { timeout: 2500 })
+  const { data } = await api.get('/productos', { timeout: 5000 })
   return data
 }
 
@@ -40,12 +40,26 @@ export async function getCategorias() {
   return data
 }
 
-export async function getProductById(id) {
-  const { data } = await api.get(`/productos/${id}`, { timeout: 2500 })
-  if (!data?.success) {
-    throw new Error(data?.message || 'Producto no encontrado')
+export async function getProductById(id, options = {}) {
+  const { timeout = 8000, retries = 1 } = options
+  let lastError = null
+
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    try {
+      const { data } = await api.get(`/productos/${id}`, { timeout })
+      if (!data?.success) {
+        throw new Error(data?.message || 'Producto no encontrado')
+      }
+      return data.data
+    } catch (error) {
+      lastError = error
+      if (attempt < retries) {
+        await new Promise((resolve) => setTimeout(resolve, 400))
+      }
+    }
   }
-  return data.data
+
+  throw lastError ?? new Error('Producto no encontrado')
 }
 
 export async function getProductosByCategoria(categoriaId) {
@@ -72,6 +86,22 @@ export async function getConfiguracion() {
   const { data } = await api.get('/configuracion', { timeout: 2500 })
   if (!data?.success) {
     throw new Error(data?.message || 'No se pudo cargar la configuración')
+  }
+  return data.data
+}
+
+export async function getDeliveryZonas() {
+  const { data } = await api.get('/delivery-zonas', { timeout: 2500 })
+  if (!data?.success) {
+    throw new Error(data?.message || 'No se pudieron cargar las zonas de delivery')
+  }
+  return data.data
+}
+
+export async function getIngredientesExtra() {
+  const { data } = await api.get('/ingredientes-extra', { timeout: 2500 })
+  if (!data?.success) {
+    throw new Error(data?.message || 'No se pudieron cargar los extras')
   }
   return data.data
 }

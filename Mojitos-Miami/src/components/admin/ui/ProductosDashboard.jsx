@@ -17,7 +17,7 @@ import {
   getAdminProductos,
   updateProducto,
 } from '@/services/adminApi'
-import { formatPrice, normalizeTextField } from '@/utils'
+import { formatPrice } from '@/utils'
 import { useAdminListControls } from '@/hooks/useAdminListControls'
 
 const emptyForm = {
@@ -29,10 +29,10 @@ const emptyForm = {
   descuento_porcentaje: '',
   stock_disponible: '',
   aviso_stock_desde: '',
-  presentacion: '',
-  detalles: '',
   caracteristicas: '{}',
   usa_variantes: false,
+  mostrar_imagen_variantes: false,
+  max_sabores: '1',
 }
 
 function toPayload(form) {
@@ -45,10 +45,12 @@ function toPayload(form) {
     descuento_porcentaje: form.descuento_porcentaje !== '' ? Number(form.descuento_porcentaje) : null,
     stock_disponible: form.stock_disponible !== '' ? Number(form.stock_disponible) : null,
     aviso_stock_desde: form.aviso_stock_desde !== '' ? Number(form.aviso_stock_desde) : null,
-    presentacion: normalizeTextField(form.presentacion),
-    detalles: normalizeTextField(form.detalles),
+    presentacion: '',
+    detalles: '',
     caracteristicas: form.caracteristicas || '{}',
     usa_variantes: form.usa_variantes,
+    mostrar_imagen_variantes: form.usa_variantes ? form.mostrar_imagen_variantes : false,
+    max_sabores: form.usa_variantes ? Number(form.max_sabores) || 1 : 1,
   }
 }
 
@@ -113,10 +115,10 @@ export default function ProductosDashboard() {
       descuento_porcentaje: row.descuento_porcentaje ?? '',
       stock_disponible: row.stock_disponible ?? '',
       aviso_stock_desde: row.aviso_stock_desde ?? '',
-      presentacion: normalizeTextField(row.presentacion),
-      detalles: normalizeTextField(row.detalles),
       caracteristicas: row.caracteristicas ?? '{}',
       usa_variantes: Boolean(Number(row.usa_variantes)),
+      mostrar_imagen_variantes: Boolean(Number(row.mostrar_imagen_variantes)),
+      max_sabores: String(Math.min(2, Math.max(1, Number(row.max_sabores) || 1))),
     })
     setModal({ mode: 'edit', id: row.id_producto })
   }
@@ -302,7 +304,16 @@ export default function ProductosDashboard() {
               <input
                 type="checkbox"
                 checked={form.usa_variantes}
-                onChange={(e) => setForm({ ...form, usa_variantes: e.target.checked })}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    usa_variantes: e.target.checked,
+                    mostrar_imagen_variantes: e.target.checked
+                      ? form.mostrar_imagen_variantes
+                      : false,
+                    max_sabores: e.target.checked ? form.max_sabores : '1',
+                  })
+                }
               />
               Usa variantes (sin precio fijo)
             </label>
@@ -321,11 +332,47 @@ export default function ProductosDashboard() {
             )}
 
             {form.usa_variantes && (
-              <ProductoVariantesEditor
-                productoId={modal.mode === 'edit' ? modal.id : null}
-                variantes={variantes}
-                onChange={setVariantes}
-              />
+              <>
+                <AdminField label="Sabores permitidos">
+                  <select
+                    className={adminInputClass}
+                    style={adminInputStyle()}
+                    value={form.max_sabores}
+                    onChange={(e) => setForm({ ...form, max_sabores: e.target.value })}
+                  >
+                    <option value="1">1 sabor (elige uno)</option>
+                    <option value="2">Hasta 2 sabores (mezcla, ej. mango + maracuyá)</option>
+                  </select>
+                </AdminField>
+                <p className="text-xs" style={{ color: 'var(--admin-text-dim)' }}>
+                  Define cuántos sabores puede elegir el cliente en este producto.
+                </p>
+
+                <label
+                  className="flex items-center gap-2 text-sm"
+                  style={{ color: 'var(--admin-text)' }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={form.mostrar_imagen_variantes}
+                    onChange={(e) =>
+                      setForm({ ...form, mostrar_imagen_variantes: e.target.checked })
+                    }
+                  />
+                  Mostrar imágenes de variantes en el sitio
+                </label>
+                <p className="text-xs" style={{ color: 'var(--admin-text-dim)' }}>
+                  Por defecto el cliente solo ve nombre y precio al elegir sabor. Las imágenes
+                  de cada variante se muestran en la carta únicamente si activas esta opción.
+                </p>
+
+                <ProductoVariantesEditor
+                  productoId={modal.mode === 'edit' ? modal.id : null}
+                  variantes={variantes}
+                  onChange={setVariantes}
+                  mostrarImagenVariantes={form.mostrar_imagen_variantes}
+                />
+              </>
             )}
 
             <AdminField label="Descripción">
@@ -365,25 +412,6 @@ export default function ProductosDashboard() {
                 />
               </AdminField>
             </div>
-
-            <AdminField label="Presentación">
-              <input
-                className={adminInputClass}
-                style={adminInputStyle()}
-                value={form.presentacion}
-                onChange={(e) => setForm({ ...form, presentacion: e.target.value })}
-                placeholder="Ej: Vaso 350ml"
-              />
-            </AdminField>
-
-            <AdminField label="Detalles">
-              <textarea
-                className={`${adminInputClass} min-h-16 resize-y`}
-                style={adminInputStyle()}
-                value={form.detalles}
-                onChange={(e) => setForm({ ...form, detalles: e.target.value })}
-              />
-            </AdminField>
 
             <AdminFormActions>
               <button

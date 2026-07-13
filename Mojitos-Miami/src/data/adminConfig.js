@@ -4,6 +4,8 @@ import {
   FiTag,
   FiBox,
   FiCreditCard,
+  FiMapPin,
+  FiPlusCircle,
   FiSettings,
 } from 'react-icons/fi'
 
@@ -13,6 +15,8 @@ export const adminMenuItems = [
   { id: 'categorias', path: '/admin/categorias', label: 'Categorías', icon: FiTag },
   { id: 'productos', path: '/admin/productos', label: 'Productos', icon: FiBox },
   { id: 'cupones', path: '/admin/cupones', label: 'Cupones', icon: FiCreditCard },
+  { id: 'delivery-zonas', path: '/admin/delivery-zonas', label: 'Delivery', icon: FiMapPin },
+  { id: 'ingredientes-extra', path: '/admin/ingredientes-extra', label: 'Extras', icon: FiPlusCircle },
   { id: 'configuracion', path: '/admin/configuracion', label: 'Configuración', icon: FiSettings },
 ]
 

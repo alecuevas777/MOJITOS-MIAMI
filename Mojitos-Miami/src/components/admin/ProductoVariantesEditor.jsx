@@ -11,7 +11,12 @@ import {
 
 const emptyVariant = { nombre_variante: '', precio: '', stock: '', img_variante: '' }
 
-export default function ProductoVariantesEditor({ productoId, variantes, onChange }) {
+export default function ProductoVariantesEditor({
+  productoId,
+  variantes,
+  onChange,
+  mostrarImagenVariantes = false,
+}) {
   const [draft, setDraft] = useState(emptyVariant)
   const [editingId, setEditingId] = useState(null)
   const [editForm, setEditForm] = useState(emptyVariant)
@@ -147,6 +152,11 @@ export default function ProductoVariantesEditor({ productoId, variantes, onChang
                     value={editForm.img_variante}
                     onChange={(img_variante) => setEditForm({ ...editForm, img_variante })}
                   />
+                  <p className="text-xs" style={{ color: 'var(--admin-text-dim)' }}>
+                    {mostrarImagenVariantes
+                      ? 'Esta imagen se mostrará al cliente al elegir este sabor.'
+                      : 'Imagen guardada en el sistema, pero oculta en el sitio hasta activar "Mostrar imágenes de variantes".'}
+                  </p>
                   <div className="flex gap-2">
                     <button
                       type="button"
@@ -238,6 +248,11 @@ export default function ProductoVariantesEditor({ productoId, variantes, onChang
             value={draft.img_variante}
             onChange={(img_variante) => setDraft({ ...draft, img_variante })}
           />
+          <p className="text-xs" style={{ color: 'var(--admin-text-dim)' }}>
+            {mostrarImagenVariantes
+              ? 'Esta imagen se mostrará al cliente al elegir este sabor.'
+              : 'Imagen guardada en el sistema, pero oculta en el sitio hasta activar "Mostrar imágenes de variantes".'}
+          </p>
           <div>
             <button
               type="button"

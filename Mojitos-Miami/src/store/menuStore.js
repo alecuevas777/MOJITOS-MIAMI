@@ -33,6 +33,10 @@ function mapProduct(p, categoryDiscountMap = new Map()) {
     category: String(p.categoria_id),
     image: resolveProductImage(p.img_prod),
     usa_variantes: usaVariantes,
+    mostrar_imagen_variantes: Boolean(Number(p.mostrar_imagen_variantes)),
+    max_sabores: usaVariantes
+      ? Math.min(2, Math.max(1, Number(p.max_sabores) || 1))
+      : 1,
     variantes: (p.variantes ?? []).map(mapVariante),
   }
 }
@@ -44,6 +48,29 @@ function mapCategory(c) {
     icon: 'grid',
     descuento_porcentaje: Number(c.descuento_porcentaje) || 0,
   }
+}
+
+/** Orden de importancia en el catálogo (Mojitos primero). */
+function getCategoryRank(name) {
+  const n = String(name ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+
+  if (n.includes('mojito')) return 0
+  if (n.includes('autor')) return 2
+  if (n.includes('coctel')) return 1
+  if (n.includes('mock')) return 3
+  return 50
+}
+
+function sortCategoriesByImportance(categories) {
+  return [...categories].sort((a, b) => {
+    const rank = getCategoryRank(a.name) - getCategoryRank(b.name)
+    if (rank !== 0) return rank
+    return String(a.name).localeCompare(String(b.name), 'es')
+  })
 }
 
 export const useMenuStore = create((set, get) => ({
@@ -73,7 +100,7 @@ export const useMenuStore = create((set, get) => ({
 
       const categories = [
         ALL_CATEGORY,
-        ...(categoriasRes.data ?? []).map(mapCategory),
+        ...sortCategoriesByImportance((categoriasRes.data ?? []).map(mapCategory)),
       ]
       const categoryDiscountMap = new Map(
         categories

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { FiPlus } from 'react-icons/fi'
+import { FiEye, FiEyeOff, FiPlus } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 import AdminPageHeader from '@/components/admin/AdminPageHeader'
 import AdminTable from '@/components/admin/AdminTable'
@@ -16,6 +16,7 @@ import {
 } from '@/services/adminApi'
 import { useAuthStore } from '@/store/authStore'
 import { useAdminListControls } from '@/hooks/useAdminListControls'
+import { formatPhone } from '@/utils'
 
 const emptyForm = {
   nom_usuario: '',
@@ -49,6 +50,7 @@ export default function UsuariosDashboard() {
   const [form, setForm] = useState(emptyForm)
   const [isSaving, setIsSaving] = useState(false)
   const [toDelete, setToDelete] = useState(null)
+  const [showPassword, setShowPassword] = useState(false)
 
   const list = useAdminListControls(usuarios, {
     searchKeys: [
@@ -78,6 +80,7 @@ export default function UsuariosDashboard() {
 
   const openCreate = () => {
     setForm(emptyForm)
+    setShowPassword(false)
     setModal({ mode: 'create' })
   }
 
@@ -88,6 +91,7 @@ export default function UsuariosDashboard() {
       correo_usuario: row.correo_usuario ?? '',
       contrasena: '',
     })
+    setShowPassword(false)
     setModal({ mode: 'edit', id: row.id_usuario })
   }
 
@@ -153,7 +157,7 @@ export default function UsuariosDashboard() {
     { key: 'id', label: 'ID', render: (row) => row.id_usuario },
     { key: 'nombre', label: 'Nombre', render: (row) => row.nom_usuario },
     { key: 'correo', label: 'Correo', render: (row) => row.correo_usuario },
-    { key: 'telefono', label: 'Teléfono', render: (row) => row.telefono_usuario },
+    { key: 'telefono', label: 'Teléfono', render: (row) => formatPhone(row.telefono_usuario) },
     {
       key: 'actions',
       label: 'Acciones',
@@ -233,7 +237,10 @@ export default function UsuariosDashboard() {
       {modal && (
         <AdminModal
           title={modal.mode === 'create' ? 'Nuevo usuario' : 'Editar usuario'}
-          onClose={() => setModal(null)}
+          onClose={() => {
+            setModal(null)
+            setShowPassword(false)
+          }}
         >
           <form onSubmit={handleSubmit} className="space-y-4">
             <AdminField label="Nombre *">
@@ -270,16 +277,27 @@ export default function UsuariosDashboard() {
             <AdminField
               label={modal.mode === 'create' ? 'Contraseña *' : 'Nueva contraseña (opcional)'}
             >
-              <input
-                type="password"
-                className={adminInputClass}
-                style={adminInputStyle()}
-                value={form.contrasena}
-                onChange={(e) => setForm({ ...form, contrasena: e.target.value })}
-                required={modal.mode === 'create'}
-                minLength={modal.mode === 'create' ? 8 : undefined}
-                placeholder={modal.mode === 'edit' ? 'Dejar vacío para no cambiar' : ''}
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  className={`${adminInputClass} pr-11`}
+                  style={adminInputStyle()}
+                  value={form.contrasena}
+                  onChange={(e) => setForm({ ...form, contrasena: e.target.value })}
+                  required={modal.mode === 'create'}
+                  minLength={modal.mode === 'create' ? 8 : undefined}
+                  placeholder={modal.mode === 'edit' ? 'Dejar vacío para no cambiar' : ''}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((current) => !current)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1"
+                  style={{ color: 'var(--admin-text-dim)' }}
+                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                >
+                  {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                </button>
+              </div>
             </AdminField>
 
             <AdminFormActions>

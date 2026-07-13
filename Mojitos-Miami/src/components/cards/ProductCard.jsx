@@ -22,7 +22,7 @@ function ProductCard({ product, priority = false }) {
   const handleAdd = () => {
     if (product.usa_variantes) {
       openProductDetail(product)
-      toast('Elige el sabor en el detalle del producto', { icon: '🍹' })
+      toast('Elige los sabores en el detalle del producto', { icon: '🍹' })
       return
     }
 
@@ -89,14 +89,12 @@ function ProductCard({ product, priority = false }) {
 
       <div className={styles.body}>
         <h3 className={styles.name}>{product.name}</h3>
-        <p className={styles.description}>{product.description}</p>
+        {product.description ? (
+          <p className={styles.description}>{product.description}</p>
+        ) : null}
 
         <div className={styles.priceRow}>
-          <span className={styles.price}>
-            {product.usa_variantes
-              ? `Desde ${formatPrice(pricing.displayPrice)}`
-              : formatPrice(pricing.displayPrice)}
-          </span>
+          <span className={styles.price}>{formatPrice(pricing.displayPrice)}</span>
 
           <button
             type="button"

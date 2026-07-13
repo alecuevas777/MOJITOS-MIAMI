@@ -1,0 +1,19 @@
+RewriteEngine On
+
+# ---------------------------------------------------------------------------
+# API PHP → api/Public/index.php
+# ---------------------------------------------------------------------------
+RewriteRule ^api(?:/.*)?$ api/Public/index.php [QSA,L]
+
+# ---------------------------------------------------------------------------
+# Uploads de productos (el frontend pide /uploads/...)
+# ---------------------------------------------------------------------------
+RewriteRule ^uploads/(.*)$ api/Public/uploads/$1 [L]
+
+# ---------------------------------------------------------------------------
+# SPA React: rutas del frontend → index.html
+# ---------------------------------------------------------------------------
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/api
+RewriteRule ^ index.html [L]

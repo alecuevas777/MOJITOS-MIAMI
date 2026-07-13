@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { FiEye, FiEyeOff } from 'react-icons/fi'
 import toast from 'react-hot-toast'
+import Seo from '@/components/common/Seo'
 import { siteConfig } from '@/data/siteConfig'
 import { adminTheme } from '@/data/adminConfig'
 import { useAuthStore } from '@/store/authStore'
@@ -51,6 +52,8 @@ export default function AdminLogin() {
   }
 
   return (
+    <>
+      <Seo title="Admin" path="/admin/login" noIndex />
     <div
       className="flex min-h-screen items-center justify-center px-4 py-10"
       style={{ backgroundColor: adminTheme.bg, color: adminTheme.text }}
@@ -163,5 +166,6 @@ export default function AdminLogin() {
         </div>
       </div>
     </div>
+    </>
   )
 }

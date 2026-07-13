@@ -301,7 +301,7 @@ export default function ConfiguracionDashboard() {
 
         <AdminSection
           title="Pedidos y delivery"
-          description="Regla general automática: no requiere cupón. Déjalo vacío para cobrar siempre el cargo de delivery."
+          description="El envío gratis automático se aplica según el subtotal y el costo de la comuna seleccionada por el cliente. Déjalo vacío para cobrar siempre el delivery de cada zona."
         >
           <AdminField label="Descuento global del catálogo (%)">
             <input
@@ -331,6 +331,10 @@ export default function ConfiguracionDashboard() {
               placeholder="Ej: 30000"
             />
           </AdminField>
+          <p className="text-xs" style={{ color: 'var(--admin-text-dim)' }}>
+            Si el subtotal del pedido alcanza este monto, el delivery queda en $0 según la zona
+            elegida. Los costos por comuna se administran en la sección Delivery.
+          </p>
         </AdminSection>
 
         <AdminSection

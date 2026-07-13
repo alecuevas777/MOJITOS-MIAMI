@@ -1,18 +1,31 @@
-# React + Vite
+# Mojitos Miami
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Carta digital y sistema de pedidos por WhatsApp para **Mojitos Miami**.
 
-Currently, two official plugins are available:
+**Sitio:** [https://mojitosmiami.cl](https://mojitosmiami.cl)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Documentación
 
-## React Compiler
+📖 **[Manual completo → MANUAL.md](./MANUAL.md)**  
+📄 **[Versión PDF → MANUAL.pdf](./MANUAL.pdf)**
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+## Acceso al panel admin
 
-Note: This will impact Vite dev & build performances.
+| Dato | Valor |
+|------|-------|
+| URL | [https://mojitosmiami.cl/admin/login](https://mojitosmiami.cl/admin/login) |
+| Nombre | Administrador |
+| Correo | `admin@mojito.cl` |
+| Contraseña | `Admin123!` |
 
-## Expanding the ESLint configuration
+> Cambiar la contraseña después del primer acceso.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Desarrollo
+
+```bash
+npm install
+npm run dev
+```
+
+- Frontend: `http://localhost:5173`
+- API: `http://localhost:8000`

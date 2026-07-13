@@ -20,6 +20,8 @@ import Footer from "@/components/footer/Footer"
 import { useFilteredMenuItems } from "@/hooks/useMenuItems"
 import { useMenuStore } from "@/store/menuStore"
 import { useConfigStore } from "@/store/configStore"
+import { useDeliveryStore } from "@/store/deliveryStore"
+import { useExtrasStore } from "@/store/extrasStore"
 
 function prefetchImages(urls) {
   urls.forEach((url) => {
@@ -41,6 +43,8 @@ export default function Catalog() {
   useEffect(() => {
     useMenuStore.getState().fetchMenu()
     useConfigStore.getState().fetchConfig()
+    useDeliveryStore.getState().fetchZones()
+    useExtrasStore.getState().fetchExtras()
   }, [])
 
   useEffect(() => {
@@ -49,7 +53,7 @@ export default function Catalog() {
 
   return (
     <>
-      <Seo />
+      <Seo path="/" />
 
       <div className="min-h-screen bg-[var(--color-bg)]">
         <Sidebar />

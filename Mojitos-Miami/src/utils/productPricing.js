@@ -61,3 +61,25 @@ export function getVariantPricing(variant, pricing) {
     displayPrice: applyDiscountPrice(basePrice, pricing.discountPercent),
   }
 }
+
+/** Precio al mezclar sabores: el más alto entre los seleccionados. */
+export function getSelectedVariantsPricing(variants, pricing) {
+  if (!variants?.length) return pricing
+
+  const priced = variants.map((variant) => getVariantPricing(variant, pricing))
+  const basePrice = Math.max(...priced.map((item) => item.basePrice))
+  const displayPrice = Math.max(...priced.map((item) => item.displayPrice))
+
+  return {
+    ...pricing,
+    basePrice,
+    displayPrice,
+  }
+}
+
+export function formatVariantNames(variants) {
+  return (variants ?? [])
+    .map((variant) => variant?.nombre_variante)
+    .filter(Boolean)
+    .join(' + ')
+}

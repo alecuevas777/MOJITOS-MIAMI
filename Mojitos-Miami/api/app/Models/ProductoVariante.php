@@ -46,6 +46,41 @@ class ProductoVariante
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Variantes agrupadas por producto (una sola consulta para listados).
+     *
+     * @param int[] $productoIds
+     * @return array<int, array<int, array<string, mixed>>>
+     */
+    public static function byProductos(array $productoIds): array
+    {
+        $productoIds = array_values(array_unique(array_filter(array_map('intval', $productoIds))));
+
+        if (!$productoIds) {
+            return [];
+        }
+
+        $db = Database::connect();
+        $placeholders = implode(',', array_fill(0, count($productoIds), '?'));
+
+        $stmt = $db->prepare(
+            'SELECT ' . self::selectColumns() . '
+             FROM producto_variantes
+             WHERE producto_id IN (' . $placeholders . ')
+             ORDER BY producto_id ASC, id_variante ASC'
+        );
+        $stmt->execute($productoIds);
+
+        $grouped = [];
+
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $productoId = (int) $row['producto_id'];
+            $grouped[$productoId][] = $row;
+        }
+
+        return $grouped;
+    }
+
     public static function find(int $id): array|false
     {
         $db = Database::connect();

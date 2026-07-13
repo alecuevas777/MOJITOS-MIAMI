@@ -20,10 +20,12 @@ class DashboardController
         $this->json([
             'success' => true,
             'data' => [
-                'usuarios'    => $this->count($db, 'usuario'),
-                'categorias'  => $this->count($db, 'categoria'),
-                'productos'   => $this->count($db, 'producto'),
-                'cupones'     => $this->count($db, 'cupon'),
+                'usuarios'           => $this->count($db, 'usuario'),
+                'categorias'         => $this->count($db, 'categoria'),
+                'productos'          => $this->count($db, 'producto'),
+                'cupones'            => $this->count($db, 'cupon'),
+                'delivery_zonas'     => $this->count($db, 'delivery_zona'),
+                'ingredientes_extra' => $this->count($db, 'ingrediente_extra'),
             ],
         ]);
     }

@@ -20,19 +20,70 @@ class Producto
         return $value;
     }
 
+    private static function normalizeMaxSabores(array $data): int
+    {
+        $max = (int) ($data['max_sabores'] ?? 1);
+
+        return max(1, min(2, $max));
+    }
+
     private static function attachVariantes(array $producto): array
     {
         if (!empty($producto['usa_variantes'])) {
             $producto['variantes'] = ProductoVariante::byProducto((int) $producto['id_producto']);
             $producto['precio_desde'] = ProductoVariante::minPrecio((int) $producto['id_producto']);
+            $producto['max_sabores'] = self::normalizeMaxSabores($producto);
         } else {
             $producto['variantes'] = [];
+            $producto['max_sabores'] = 1;
         }
 
         $producto['presentacion'] = self::normalizeTextField((string) ($producto['presentacion'] ?? ''));
         $producto['detalles'] = self::normalizeTextField((string) ($producto['detalles'] ?? ''));
 
         return $producto;
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $rows
+     * @return array<int, array<string, mixed>>
+     */
+    private static function attachVariantesBatch(array $rows): array
+    {
+        $idsWithVariantes = [];
+
+        foreach ($rows as $row) {
+            if (!empty($row['usa_variantes'])) {
+                $idsWithVariantes[] = (int) $row['id_producto'];
+            }
+        }
+
+        $variantMap = $idsWithVariantes
+            ? ProductoVariante::byProductos($idsWithVariantes)
+            : [];
+
+        return array_map(function (array $row) use ($variantMap): array {
+            if (!empty($row['usa_variantes'])) {
+                $id = (int) $row['id_producto'];
+                $variantes = $variantMap[$id] ?? [];
+                $row['variantes'] = $variantes;
+
+                $precios = array_map(
+                    static fn ($variante) => (float) $variante['precio'],
+                    $variantes
+                );
+                $row['precio_desde'] = $precios ? min($precios) : null;
+                $row['max_sabores'] = self::normalizeMaxSabores($row);
+            } else {
+                $row['variantes'] = [];
+                $row['max_sabores'] = 1;
+            }
+
+            $row['presentacion'] = self::normalizeTextField((string) ($row['presentacion'] ?? ''));
+            $row['detalles'] = self::normalizeTextField((string) ($row['detalles'] ?? ''));
+
+            return $row;
+        }, $rows);
     }
 
     /**
@@ -52,7 +103,7 @@ class Producto
 
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        return array_map(fn ($row) => self::attachVariantes($row), $rows);
+        return self::attachVariantesBatch($rows);
     }
 
     public static function find(int $id): array|false
@@ -96,7 +147,7 @@ class Producto
 
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        return array_map(fn ($row) => self::attachVariantes($row), $rows);
+        return self::attachVariantesBatch($rows);
     }
 
     public static function create(array $data): int
@@ -107,11 +158,11 @@ class Producto
             'INSERT INTO producto
                 (nom_producto, precio_producto, descuento_porcentaje, stock_disponible,
                  aviso_stock_desde, descripcion_producto, img_prod, categoria_id,
-                 caracteristicas, presentacion, detalles, usa_variantes)
+                 caracteristicas, presentacion, detalles, usa_variantes, mostrar_imagen_variantes, max_sabores)
              VALUES
                 (:nom_producto, :precio_producto, :descuento_porcentaje, :stock_disponible,
                  :aviso_stock_desde, :descripcion_producto, :img_prod, :categoria_id,
-                 :caracteristicas, :presentacion, :detalles, :usa_variantes)'
+                 :caracteristicas, :presentacion, :detalles, :usa_variantes, :mostrar_imagen_variantes, :max_sabores)'
         );
 
         $stmt->execute([
@@ -127,6 +178,10 @@ class Producto
             'presentacion'          => self::normalizeTextField((string) ($data['presentacion'] ?? '')),
             'detalles'              => self::normalizeTextField((string) ($data['detalles'] ?? '')),
             'usa_variantes'         => !empty($data['usa_variantes']) ? 1 : 0,
+            'mostrar_imagen_variantes' => !empty($data['mostrar_imagen_variantes']) ? 1 : 0,
+            'max_sabores'           => !empty($data['usa_variantes'])
+                ? self::normalizeMaxSabores($data)
+                : 1,
         ]);
 
         return (int) $db->lastInsertId();
@@ -149,7 +204,9 @@ class Producto
                 caracteristicas = :caracteristicas,
                 presentacion = :presentacion,
                 detalles = :detalles,
-                usa_variantes = :usa_variantes
+                usa_variantes = :usa_variantes,
+                mostrar_imagen_variantes = :mostrar_imagen_variantes,
+                max_sabores = :max_sabores
              WHERE id_producto = :id'
         );
 
@@ -167,6 +224,10 @@ class Producto
             'presentacion'          => self::normalizeTextField((string) ($data['presentacion'] ?? '')),
             'detalles'              => self::normalizeTextField((string) ($data['detalles'] ?? '')),
             'usa_variantes'         => !empty($data['usa_variantes']) ? 1 : 0,
+            'mostrar_imagen_variantes' => !empty($data['mostrar_imagen_variantes']) ? 1 : 0,
+            'max_sabores'           => !empty($data['usa_variantes'])
+                ? self::normalizeMaxSabores($data)
+                : 1,
         ]);
     }
 

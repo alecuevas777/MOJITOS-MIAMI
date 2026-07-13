@@ -152,3 +152,43 @@ export async function updateConfiguracion(payload) {
   }
   return data
 }
+
+export async function getDeliveryZonas() {
+  const { data } = await api.get('/delivery-zonas')
+  return data
+}
+
+export async function createDeliveryZona(payload) {
+  const { data } = await api.post('/delivery-zonas', payload)
+  return data
+}
+
+export async function updateDeliveryZona(id, payload) {
+  const { data } = await api.put(`/delivery-zonas/${id}`, payload)
+  return data
+}
+
+export async function deleteDeliveryZona(id) {
+  const { data } = await api.delete(`/delivery-zonas/${id}`)
+  return data
+}
+
+export async function getIngredientesExtra() {
+  const { data } = await api.get('/ingredientes-extra')
+  return data
+}
+
+export async function createIngredienteExtra(payload) {
+  const { data } = await api.post('/ingredientes-extra', payload)
+  return data
+}
+
+export async function updateIngredienteExtra(id, payload) {
+  const { data } = await api.put(`/ingredientes-extra/${id}`, payload)
+  return data
+}
+
+export async function deleteIngredienteExtra(id) {
+  const { data } = await api.delete(`/ingredientes-extra/${id}`)
+  return data
+}
