@@ -174,7 +174,9 @@ export default function ProductDetailModal() {
             <h2 id="product-detail-title" className={styles.name}>
               {product.name}
             </h2>
-            <p className={styles.description}>{product.description}</p>
+            {product.description ? (
+              <p className={styles.description}>{product.description}</p>
+            ) : null}
             <p className={styles.price}>
               {product.usa_variantes
                 ? selectedVariant
